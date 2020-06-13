@@ -25,7 +25,7 @@ headers = {
     'cache-control': "no-cache"
     }
 
-conn.request("GET", "/wp-json/wp/v2/posts?per_page=20")
+conn.request("GET", "/wp-json/wp/v2/posts?per_page=30")
 res = conn.getresponse()
 data = json.loads(res.read())
 
@@ -33,17 +33,21 @@ refDateObj = datetime.datetime.strptime(data[0]["date"],'%Y-%m-%dT%H:%M:%S')
 
 strF = '📮 *Janata Weekly*\n'
 strF += '*Issue: '+ refDateObj.strftime('%d %B, %Y')+'*\n\n'
-strF +='👍 https://facebook.com/JanataWeekly\n\n'
-strF +='*Articles for this week*\n'
-for i in range(0,20):
+strF +='👍 https://facebook.com/JanataWeekly \n'
+strF +='\n*_Articles for this week_*\n\n'
+j=1
+for i in range(29,-1,-1):
 	print(data[i]["author"])
 	if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
-		strF += ""+ str(i) +". "+data[i]["title"]["rendered"]+"\n"
+		strF += ""+ str(j) +". *"+data[i]["title"]["rendered"]+"*\n"
 		authorName = getAuthorName(data[i]["author"])
 		print(authorName)
-		strF += "By _"+authorName+"_\n"
+		strF += "_By "+authorName+"_\n\n"
 		# strF += "By _AuthorName_\n"
-		strF += data[i]["link"]+"\n-----------------------------------------------------------\n"
+		strF += data[i]["link"] +"\n-----------------------------------------------------------\n" # + "\n IMAGE: " + \
+		# data[i]["jetpack_featured_media_url"] 
+		j=j+1
+
 
 strF += "\n➖➖➖➖➖➖➖➖➖➖➖\n📋 *About Janata Weekly :*\nJanata Weekly is an independent socialist journal. It has raised its challenging voice of principled dissent against all conduct and practice that is detrimental to the cherished values of nationalism, democracy, secularism and socialism, while upholding the integrity and the ethical norms of healthy journalism. It has the enviable reputation of being the oldest continuously published socialist journal in India."
 strF += "\n📢Oldest socialist weekly of India, is now also on facebook!\n"
