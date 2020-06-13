@@ -1,4 +1,5 @@
 import http.client
+import json
 
 conn = http.client.HTTPConnection("janataweekly.org")
 
@@ -25,10 +26,10 @@ headers = {
     'Authorization': "Bearer "+tokendata["token"]
     }
 
-#post = {"title":"new temp post"}
-payload = json.dumps(post)
+#post = {"per_page":20}
+#payload = json.dumps(post)
 
-#conn.request("POST", "/wp-json/wp/v2/posts", payload, headers)
+conn.request("GET", "/wp-json/wp/v2/posts?per_page=20"), {}, headers)
 
 res = conn.getresponse()
 data = res.read()
