@@ -1,6 +1,5 @@
 from JAP_Authentication.authenticate import get_creds
 from DocParser.parse_doc import get_summary_data
-from pprint import pprint
 from requests_oauthlib import OAuth1Session
 import requests
 from requests_oauthlib import OAuth1
@@ -14,22 +13,19 @@ def get_authors_list(summary_data):
         authors_list.append(article['article_author'])
     return authors_list
 
+
+
 def get_author(author,creds):
     protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+author
-
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
                 }
-
-
-
     oauth = OAuth1Session(    
                             creds['client_key'],
                             client_secret=creds['client_secret'],
                             resource_owner_key=creds['resource_owner_key'],
                             resource_owner_secret=creds['resource_owner_secret']
                         )
-
     r = oauth.get(protected_url,headers=headers)
     if len(r.json()) == 0:
         return False
@@ -37,15 +33,14 @@ def get_author(author,creds):
         author = r.json()[0]
         return author
 
+
+
 def create_author(author,creds):
-
     protected_url='https://janataweekly.org/wp-json/wp/v2/users'
-
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                      
                 }
-
     username=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
     email=username+'@test.com'
     data={
@@ -55,14 +50,12 @@ def create_author(author,creds):
             'roles':'author',
             'password':'testpass@1234'
             }
-
     oauth = OAuth1Session(    
                             creds['client_key'],
                             client_secret=creds['client_secret'],
                             resource_owner_key=creds['resource_owner_key'],
                             resource_owner_secret=creds['resource_owner_secret']
                         )
-
     r = oauth.post(protected_url,headers=headers,data=data)
     if r.status_code != 200:
         return False
@@ -89,10 +82,6 @@ def add_authors(authors_list):
         print('Total authors created : ' + str(author_added_count))
 
 
-summaryfile='C:/Users/akshay.raut/Downloads/Summary.docx'
-summary_data = get_summary_data(summaryfile)
-authors_list = get_authors_list(summary_data)
-add_authors(authors_list)
 
     
     
