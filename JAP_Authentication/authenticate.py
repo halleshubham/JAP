@@ -12,24 +12,3 @@ def get_creds():
         return False
     else:
         return creds
-
-'''
-protected_url='http://janataweekly.org/wp-json/wp/v2/users/me'
-
-headers = { 
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
-            }
-
-
-
-oauth = OAuth1Session(    
-                        creds['client_key'],
-                        client_secret=creds['client_secret'],
-                        resource_owner_key=creds['resource_owner_key'],
-                        resource_owner_secret=creds['resource_owner_secret']
-                    )
-
-r = oauth.get(protected_url,headers=headers)
-
-print(r.content)
-'''
