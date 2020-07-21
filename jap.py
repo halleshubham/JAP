@@ -16,7 +16,8 @@ def get_authors_list(summary_data):
 
 
 def get_author(author,creds):
-    protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+author
+    username=''.join(e for e in author if e.isalnum())
+    protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+username
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
                 }
@@ -57,7 +58,7 @@ def create_author(author,creds):
                             resource_owner_secret=creds['resource_owner_secret']
                         )
     r = oauth.post(protected_url,headers=headers,data=data)
-    if r.status_code != 200:
+    if r.status_code != 201:
         return False
     else:
         return True

@@ -9,7 +9,9 @@ def get_summary_data(summaryfile):
             continue
         file_data.append(para.text)
     for i in range(1, len(file_data),3):
-        article_number, article_title = file_data[i].split('.')
+        li=file_data[i].split('.')
+        article_number=li[0]
+        article_title = '.'.join(li[1:])
         article_author_pre = file_data[i+1].split(' ')
         if article_author_pre[0] == 'by':
             article_author_pre.remove('by')
