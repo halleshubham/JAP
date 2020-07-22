@@ -24,9 +24,11 @@ An automation tool for creating draft posts on Wordpress using Rest API.
     - ***articles_folder_path*** : Full path to the folder containing only articles files for the current issue.
     - ***images_folder_path*** : Full path to the folder containing only images for the current issue.  
 
-    >**Important:**
+    >
+    >### Important:
     >
     >Name of the images should be the article number e.g 1.png/1.jpeg. 
     >
-    >If runnig the script in Windows machine, replace '\' with '/' in the all the folder/file paths. 
+    >If runnig the script in Windows machine, replace '\' with '/' in the all the folder/file paths.
+    > 
 2. Run **create_post.py**
