@@ -2,7 +2,7 @@
 An automation tool for creating draft posts on Wordpress using Rest API.
 
 ## Configuration 
-### (when using this for first time after clonning) 
+### (When using this for the first time after clonning) 
 1. Create a **jap_config.json** file in **JAP_Authentication** folder  with following content:
  
             {
@@ -24,7 +24,7 @@ An automation tool for creating draft posts on Wordpress using Rest API.
     - ***articles_folder_path*** : Full path to the folder containing only articles files for the current issue.
     - ***images_folder_path*** : Full path to the folder containing only images for the current issue.  
     - ***publish_date*** : Issue date in YYYY-MM-DD format  
-    
+
     <br> 
 
     >
