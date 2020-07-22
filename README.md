@@ -23,7 +23,8 @@ An automation tool for creating draft posts on Wordpress using Rest API.
     - ***summaryfile*** : Full path to summary.docx file. 
     - ***articles_folder_path*** : Full path to the folder containing only articles files for the current issue.
     - ***images_folder_path*** : Full path to the folder containing only images for the current issue.  
-
+    <br>
+    >
     >
     >### Important:
     >
@@ -31,4 +32,5 @@ An automation tool for creating draft posts on Wordpress using Rest API.
     >
     >If runnig the script in Windows machine, replace '\' with '/' in the all the folder/file paths.
     > 
+    >
 2. Run **create_post.py**
