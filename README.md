@@ -14,7 +14,7 @@ An automation tool for creating draft posts on Wordpress using Rest API.
             } 
 
 2. Run **authorize.py** from **JAP_Authentication** folder and then follow the instructions.
-3. Once done, check the **jap_config.json** again, it should now have **"resource_owner_key** and **resource_owner_secret** keys.
+3. Once done, check the **jap_config.json** again, it should now have **resource_owner_key** and **resource_owner_secret** keys.
 4. Done! You are all set now.
 
 
