@@ -23,6 +23,8 @@ An automation tool for creating draft posts on Wordpress using Rest API.
     - ***summaryfile*** : Full path to summary.docx file. 
     - ***articles_folder_path*** : Full path to the folder containing only articles files for the current issue.
     - ***images_folder_path*** : Full path to the folder containing only images for the current issue.  
+    - ***publish_date*** : Issue date in YYYY-MM-DD format  
+    
     <br> 
 
     >
