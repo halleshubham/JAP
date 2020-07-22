@@ -30,26 +30,3 @@ def get_summary_data(summaryfile):
 
 
 
-def get_article_data(articlefile):
-    article_number = articlefile.split('/')[-1].split('-')[0]
-    doc=docx.Document(articlefile)
-    article_title = doc.paragraphs[0].text
-    file_data=[]
-    for para in doc.paragraphs:
-        print(len(para.runs))
-        for run in para.runs:
-            print(run.text)
-        file_data.append(para.text)
-    article_body = '\n'.join(file_data[1:])
-    article = {
-                    'article_number' : article_number,
-                    'article_title' : article_title,
-                    'article_body' : article_body
-                }
-    return article
-
-'''
-summaryfile='C:/Users/akshay.raut/Downloads/Summary.docx'  
-articlefile='C:/Users/akshay.raut/Desktop/JAP/JAP/gDocParser/13-How Racism is an Essential Tool for Maintaining the Capitalist Order_Richard D. Wolff.docx'
-a=get_article_data(articlefile)'''
-
