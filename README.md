@@ -31,9 +31,10 @@ An automation tool for creating draft posts on Wordpress using Rest API.
     >
     >### Important:
     >
-    >Name of the images should be the article number e.g 1.png/1.jpeg. 
+    >1. Name of the images should be the article number e.g 1.png/1.jpeg. 
     >
-    >If runnig the script in Windows machine, replace '\\' with '/' in the all the folder/file paths.
+    >2. If runnig the script in Windows machine, **replace '\\' with '/'** in the all the folder/file paths.
     > 
+    >3. All **.doc** files should be converted to **.docx** file. This script won't work on **.doc** files.  
     >
 2. Run **create_post.py**
