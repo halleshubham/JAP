@@ -1,7 +1,4 @@
 from JAP_Authentication.authenticate import get_creds
-from requests_oauthlib import OAuth1Session
-import requests
-from requests_oauthlib import OAuth1
 import json
 from pprint import pprint
 import os

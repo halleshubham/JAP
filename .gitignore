@@ -1,3 +1,5 @@
 JAP_Authentication/jap_config.json
 *.docx
 *__pycache__/
+jap/
+.vscode/
