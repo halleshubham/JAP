@@ -93,7 +93,7 @@ def upload_images(folder_path,creds):
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
                 }
-    image_ids=[]
+    image_ids={}
     for image_file in os.listdir(folder_path):
         data ={
             'file': open(folder_path+image_file,'rb')
@@ -108,8 +108,10 @@ def upload_images(folder_path,creds):
         r = oauth.post(protected_url,headers=headers,files=data)
         if r.status_code!=201:
             print('Image "' + image_file +'" could not be uploaded')
+            print(r.content)
             return False
-        image_ids.append(r.json()['id'])
+        image_number=image_file.split('.')[0]
+        image_ids[image_number]=r.json()['id']
         print('Image "' + image_file +'" uploaded successfully')    
     return image_ids
 

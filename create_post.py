@@ -11,14 +11,15 @@ creds=get_creds()
 
 if creds:
     # getting Summary data
-    summaryfile='C:/Users/akshay.raut/Downloads/Summary Janata 12.docx'
+    summaryfile='C:/Users/akshay.raut/Downloads/Summary.docx'
     summary_data = get_summary_data(summaryfile)
 
     # getting articles files
     articles_folder_path='C:/Users/akshay.raut/Downloads/articles_folder/'
-    artilces_files=[]
+    artilces_files={}
     for article in os.listdir(articles_folder_path):
-        artilces_files.append(article)
+        article_number=article.split('-')[0]
+        artilces_files[article_number]=article
 
     # Uploading images
     images_folder_path='C:/Users/akshay.raut/Downloads/image_folder/'
@@ -41,7 +42,7 @@ if creds:
 
         for i in range(len(artilces_files)):
 
-            artilce_path=articles_folder_path+artilces_files[i]
+            artilce_path=articles_folder_path+artilces_files[str(int(i)+1)]
             with open(artilce_path, "rb") as docx_file:
                 result = mammoth.convert_to_html(docx_file)
                 article_content = result.value
@@ -54,7 +55,7 @@ if creds:
             article_title = summary_data[i]['article_title']
             article_exerpt = summary_data[i]['article_exerpt']
             article_slug = article_title
-            article_image_id=image_ids[i]
+            article_image_id=image_ids[str(int(i)+1)]
             article_author_id=authors_ids[i]
 
             data={
