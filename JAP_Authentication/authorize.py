@@ -8,9 +8,9 @@ if os.path.exists(creds_path):
         creds=json.load(f)
 
     urls={
-            "request_token_url" : "http://janataweekly.org/oauth1/request",
-            "base_authorization_url" : "http://janataweekly.org/oauth1/authorize",
-            "access_token_url" : "http://janataweekly.org/oauth1/access",
+            "request_token_url" : "https://janataweekly.org/oauth1/request",
+            "base_authorization_url" : "https://janataweekly.org/oauth1/authorize",
+            "access_token_url" : "https://janataweekly.org/oauth1/access",
             "call_back_url" : "http://janataweekly.org/"
         }
 

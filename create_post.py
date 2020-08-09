@@ -11,27 +11,28 @@ creds=get_creds()
 
 if creds:
     # getting Summary data
-    summaryfile='C:/Users/akshay.raut/Downloads/Summary Janata 12.docx'
+    summaryfile='C:/Users/Ak/Downloads/done/Summary_Janata_July 26.docx'
     summary_data = get_summary_data(summaryfile)
-
+    
     # getting articles files
-    articles_folder_path='C:/Users/akshay.raut/Downloads/articles_folder/'
-    artilces_files=[]
+    articles_folder_path='C:/Users/Ak/Downloads/done/articles/'
+    artilces_files={}
     for article in os.listdir(articles_folder_path):
-        artilces_files.append(article)
+        article_number=article.split('-')[0]
+        artilces_files[article_number]=article
 
     # Uploading images
-    images_folder_path='C:/Users/akshay.raut/Downloads/image_folder/'
+    images_folder_path='C:/Users/Ak/Downloads/done/images/'
     image_ids=upload_images(images_folder_path,creds)
     print('\n------------------------------------------------------------\n')
-
+    
     # Adding authors
     authors_list = get_authors_list(summary_data)
     authors_ids= add_authors(authors_list,creds)
     print('\n------------------------------------------------------------\n')
-
+    
     # initializing publish date
-    publish_date='2020-7-19'
+    publish_date='2020-7-26'
     publish_time_hour='1'
 
     posts_created=[]
@@ -41,7 +42,7 @@ if creds:
 
         for i in range(len(artilces_files)):
 
-            artilce_path=articles_folder_path+artilces_files[i]
+            artilce_path=articles_folder_path+artilces_files[str(int(i)+1)]
             with open(artilce_path, "rb") as docx_file:
                 result = mammoth.convert_to_html(docx_file)
                 article_content = result.value
@@ -54,7 +55,7 @@ if creds:
             article_title = summary_data[i]['article_title']
             article_exerpt = summary_data[i]['article_exerpt']
             article_slug = article_title
-            article_image_id=image_ids[i]
+            article_image_id=image_ids[str(int(i)+1)]
             article_author_id=authors_ids[i]
 
             data={
@@ -87,4 +88,3 @@ if creds:
             print('Posts could not be created for '+ str(len(posts_not_created)) +' articles :')
             for i in range(len(posts_not_created)):
                 print(str(i+1)+'. '+posts_not_created[i])
-

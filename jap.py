@@ -5,7 +5,7 @@ from requests_oauthlib import OAuth1
 import json
 import os
 from pprint import pprint
-
+import unidecode
 
 
 def get_authors_list(summary_data):
@@ -17,8 +17,7 @@ def get_authors_list(summary_data):
 
 
 def get_author(author,creds):
-    username=''.join(e for e in author if e.isalnum())
-    protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+username
+    protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+author
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
                 }
@@ -43,7 +42,8 @@ def create_author(author,creds):
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                      
                 }
-    username=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
+    username=''.join(e for e in author if e.isalnum()) # for removing all the special charathers
+    username = unidecode.unidecode(username_pre) 
     email=username+'@test.com'
     data={
             'username':username,
@@ -93,7 +93,7 @@ def upload_images(folder_path,creds):
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
                 }
-    image_ids=[]
+    image_ids={}
     for image_file in os.listdir(folder_path):
         data ={
             'file': open(folder_path+image_file,'rb')
@@ -108,8 +108,10 @@ def upload_images(folder_path,creds):
         r = oauth.post(protected_url,headers=headers,files=data)
         if r.status_code!=201:
             print('Image "' + image_file +'" could not be uploaded')
+            print(r.content)
             return False
-        image_ids.append(r.json()['id'])
+        image_number=image_file.split('.')[0]
+        image_ids[image_number]=r.json()['id']
         print('Image "' + image_file +'" uploaded successfully')    
     return image_ids
 
@@ -132,7 +134,3 @@ def create_post(data,creds):
         return False
     else:
         return True
-
-
-    
-    
