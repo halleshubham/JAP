@@ -11,7 +11,7 @@ creds=get_creds()
 
 if creds:
     # getting Summary data
-    summaryfile='C:/Users/akshay.raut/Downloads/Summary.docx'
+    summaryfile='C:/Users/akshay.raut/Downloads/Summary articles.docx'
     summary_data = get_summary_data(summaryfile)
 
     # getting articles files
@@ -32,7 +32,7 @@ if creds:
     print('\n------------------------------------------------------------\n')
 
     # initializing publish date
-    publish_date='2020-7-19'
+    publish_date='2020-8-2'
     publish_time_hour='1'
 
     posts_created=[]

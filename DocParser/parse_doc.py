@@ -5,7 +5,7 @@ def get_summary_data(summaryfile):
     file_data=[]
     summary_data=[]
     for para in doc.paragraphs:
-        if para.text == '':
+        if para.text == '' or para.text == '\n' or para.text == ' ':
             continue
         file_data.append(para.text)
     for i in range(1, len(file_data),3):

@@ -17,8 +17,7 @@ def get_authors_list(summary_data):
 
 
 def get_author(author,creds):
-    username=''.join(e for e in author if e.isalnum())
-    protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+username
+    protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+author
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
                 }
