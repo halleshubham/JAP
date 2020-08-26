@@ -134,10 +134,10 @@ def delete_images(id_list,creds):
                                 resource_owner_secret=creds['resource_owner_secret']
                             )
     for id in id_list:
-        protected_url='https://janataweekly.org/wp-json/wp/v2/media/'+id
+        protected_url='https://janataweekly.org/wp-json/wp/v2/media/'+str(id)
         r = oauth.delete(protected_url,headers=headers)
         print(r.status_code)
-        print(r.josn())
+        #print(r.josn())
     print("Deleted old images!")
 
 

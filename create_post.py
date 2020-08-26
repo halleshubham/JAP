@@ -11,11 +11,11 @@ creds=get_creds()
 
 if creds:
     # getting Summary data
-    summaryfile='C:/Users/akshay.raut/Downloads/Summary articles.docx'
+    summaryfile='C:/Users/akshay.raut/Downloads/Summary.docx'
     summary_data = get_summary_data(summaryfile)
 
     # getting articles files
-    articles_folder_path='C:/Users/akshay.raut/Downloads/articles_folder/'
+    articles_folder_path='C:/Users/akshay.raut/Downloads/articles/'
     artilces_files={}
     for article in os.listdir(articles_folder_path):
         article_number=article.split('-')[0]
@@ -29,9 +29,10 @@ if creds:
 
     if authors_ids:
         # Uploading images
-        images_folder_path='C:/Users/akshay.raut/Downloads/image_folder/'
+        images_folder_path='C:/Users/akshay.raut/Downloads/Images/'
         image_dict=upload_images(images_folder_path,creds)
         image_ids=image_dict['image_ids']
+        print(image_ids)
         print('\n------------------------------------------------------------\n')
 
     
@@ -95,9 +96,9 @@ if creds:
                         print(str(i+1)+'. '+posts_not_created[i]) 
 
             except :
-                delete_images(image_dict['image_ids'],creds)
+                delete_images(image_dict['image_ids'].values(),creds)
         else:
-            delete_images(image_dict['image_ids'],creds)
+            delete_images(image_dict['image_ids'].values(),creds)
     else:
         print("Unable to create all the authors! Script stopped.")
                 
