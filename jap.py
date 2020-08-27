@@ -18,7 +18,9 @@ def get_authors_list(summary_data):
 
 
 def get_author(author,creds):
-    protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+author
+    username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
+    username = unidecode.unidecode(username_pre)
+    protected_url='https://janataweekly.org/wp-json/wp/v2/users?slug='+username
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
                 }
@@ -29,11 +31,6 @@ def get_author(author,creds):
                             resource_owner_secret=creds['resource_owner_secret']
                         )
     r = oauth.get(protected_url,headers=headers)
-    if r.status_code == 401 :
-        username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
-        username = unidecode.unidecode(username_pre)
-        protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+username
-        r = oauth.get(protected_url,headers=headers)
     if len(r.json()) == 0:
         return False
     else :
