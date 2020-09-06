@@ -8,6 +8,7 @@ from pprint import pprint
 import unidecode
 
 
+
 def get_authors_list(summary_data):
     authors_list = []
     for article in summary_data:
@@ -17,14 +18,17 @@ def get_authors_list(summary_data):
 
 
 def get_author(author,creds):
-    protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+author
+    username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
+    username = unidecode.unidecode(username_pre)
+    protected_url='https://janataweekly.org/wp-json/wp/v2/users?slug='+username
+
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
                 }
     oauth = OAuth1Session(    
                             creds['client_key'],
                             client_secret=creds['client_secret'],
-                            resource_owner_key=creds['resource_owner_key'],
+                            resource_owner_key=creds['resource_owner_key'], 
                             resource_owner_secret=creds['resource_owner_secret']
                         )
     r = oauth.get(protected_url,headers=headers)
@@ -42,8 +46,9 @@ def create_author(author,creds):
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                      
                 }
-    username=''.join(e for e in author if e.isalnum()) # for removing all the special charathers
-    username = unidecode.unidecode(username_pre) 
+    username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
+    username = unidecode.unidecode(username_pre)
+
     email=username+'@test.com'
     data={
             'username':username,
@@ -59,10 +64,11 @@ def create_author(author,creds):
                             resource_owner_secret=creds['resource_owner_secret']
                         )
     r = oauth.post(protected_url,headers=headers,data=data)
-    if r.status_code != 201:
-        return False
-    else:
+    if r.status_code == 201:
         return r.json()['id']
+    else:
+        print(r.json())
+        return False
 
 
 
@@ -109,11 +115,30 @@ def upload_images(folder_path,creds):
         if r.status_code!=201:
             print('Image "' + image_file +'" could not be uploaded')
             print(r.content)
-            return False
+            return {'status':False,'image_ids':image_ids}
+
         image_number=image_file.split('.')[0]
         image_ids[image_number]=r.json()['id']
         print('Image "' + image_file +'" uploaded successfully')    
-    return image_ids
+    return {'status':True,'image_ids':image_ids}
+
+def delete_images(id_list,creds):
+    headers = { 
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                     
+                }
+    oauth = OAuth1Session(    
+                                creds['client_key'],
+                                client_secret=creds['client_secret'],
+                                resource_owner_key=creds['resource_owner_key'],
+                                resource_owner_secret=creds['resource_owner_secret']
+                            )
+    for id in id_list:
+        protected_url='https://janataweekly.org/wp-json/wp/v2/media/'+str(id)
+        r = oauth.delete(protected_url,headers=headers)
+        print(r.status_code)
+        #print(r.josn())
+    print("Deleted old images!")
 
 
 def create_post(data,creds):

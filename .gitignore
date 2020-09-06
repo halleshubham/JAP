@@ -3,3 +3,4 @@ JAP_Authentication/jap_config.json
 *__pycache__/
 jap/
 .vscode/
+author_test.py
