@@ -13,7 +13,7 @@ if creds:
     # getting Summary data
     summaryfile='C:/Users/akshay.raut/Downloads/Summary.docx'
     summary_data = get_summary_data(summaryfile)
-
+    
     # getting articles files
     articles_folder_path='C:/Users/akshay.raut/Downloads/articles/'
     artilces_files={}
@@ -27,15 +27,13 @@ if creds:
     authors_ids= add_authors(authors_list,creds)
     print('\n------------------------------------------------------------\n')
 
+
     if authors_ids:
         # Uploading images
         images_folder_path='C:/Users/akshay.raut/Downloads/Images/'
         image_dict=upload_images(images_folder_path,creds)
         image_ids=image_dict['image_ids']
         print(image_ids)
-        print('\n------------------------------------------------------------\n')
-
-    
 
         # initializing publish date
         publish_date='2020-8-9'
@@ -102,4 +100,3 @@ if creds:
     else:
         print("Unable to create all the authors! Script stopped.")
                 
-
