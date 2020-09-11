@@ -1,0 +1,37 @@
+Metadata-Version: 2.1
+Name: common-exceptions
+Version: 0.1.1
+Summary: Common exceptions
+Home-page: UNKNOWN
+Author: Lane
+Author-email: 
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+
+# 通用异常
+
+
+## CHANGELOG
+
+### 0.1.1
+
+- 新增四个异常类
+    - UserNotExist: 用户不存在
+    - UserBannedError: 用户被封
+    - ArticleNotExistError: 文章不存在
+    - ArticleBannedError: 文章被封
+
+
+## 支持的异常
+
+- UserNotExist: 用户不存在
+- UserBannedError: 用户被封
+- ArticleNotExistError: 文章不存在
+- ArticleBannedError: 文章被封
+
+

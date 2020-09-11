@@ -3,9 +3,12 @@
     "",
     "\\Authentication",
     "\\gDocParser",
-    "\\publishing",
-    "\\publishing\\Whatsapp Scripts"
+    "\\Janata",
+    "\\Janata\\Facebook",
+    "\\Janata\\Newsletter",
+    "\\Janata\\Whatsapp",
+    "\\Twitter_Storm"
   ],
-  "SelectedNode": "\\publishing\\Whatsapp Scripts\\AllWhatsappArticlesWithNumbersAndSeperated.py",
+  "SelectedNode": "\\Janata\\Editing Wordpress Articles selenium.py",
   "PreviewInSolutionExplorer": false
 }

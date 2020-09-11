@@ -19,6 +19,7 @@ def getArticle():
 
 a = getArticle()
 q=0
+
 sum=len(a["data"])
 while (q<sum):
 	graph = facebook.GraphAPI(access_token="EAAObhNZCDIcUBALizI7Ou26PxEbhnq80u2K1d1XSMPT3AOQ1BKF6UW47qQ2diQkklI2oCj5mPTiSdk2p3sMf3ZBTqGt7IkWPrh3pk8CTUaU0ZBN7qZBiHZClZA8z4IIvjMAGRntMcdJjHL19mtNx8ZB0I3PfGXWNW48hZB6BK28o3eDEZA3YuASOzEwbG01HhVNx6RaiA1ZA7OGAZDZD")
