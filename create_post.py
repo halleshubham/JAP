@@ -13,7 +13,7 @@ if creds:
     # getting Summary data
     summaryfile='C:/Users/akshay.raut/Downloads/Summary.docx'
     summary_data = get_summary_data(summaryfile)
-
+    
     # getting articles files
     articles_folder_path='C:/Users/akshay.raut/Downloads/articles/'
     artilces_files={}
@@ -108,4 +108,3 @@ if creds:
     else:
         print("Unable to create all the authors! Script stopped.")
                 
-

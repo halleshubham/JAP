@@ -21,6 +21,7 @@ def get_author(author,creds):
     username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
     username = unidecode.unidecode(username_pre)
     protected_url='https://janataweekly.org/wp-json/wp/v2/users?slug='+username
+
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
                 }
@@ -47,6 +48,7 @@ def create_author(author,creds):
                 }
     username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
     username = unidecode.unidecode(username_pre)
+
     email=username+'@test.com'
     data={
             'username':username,
@@ -162,7 +164,3 @@ def create_post(data,creds):
         return False
     else:
         return True
-
-
-    
-    
