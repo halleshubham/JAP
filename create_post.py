@@ -10,12 +10,17 @@ import mammoth
 creds=get_creds()
 
 if creds:
+
+    # getting the parameters from issue_params.json
+    with open('issue_params.json') as params_file:
+        params = json.load(params_file)
+
     # getting Summary data
-    summaryfile='C:/Users/akshay.raut/Downloads/Summary.docx'
+    summaryfile = params['summaryfile']
     summary_data = get_summary_data(summaryfile)
     
     # getting articles files
-    articles_folder_path='C:/Users/akshay.raut/Downloads/articles/'
+    articles_folder_path = params['articles_folder_path']
     artilces_files={}
     for article in os.listdir(articles_folder_path):
         article_number=article.split('-')[0]
@@ -30,11 +35,11 @@ if creds:
 
     if authors_ids:
         # Uploading images
-        images_folder_path='C:/Users/akshay.raut/Downloads/Images/'
+        images_folder_path = params['images_folder_path']
         image_dict=upload_images(images_folder_path,creds,len(authors_ids))
         
         # initializing publish date
-        publish_date='2020-9-6'
+        publish_date = params['publish_date']
         publish_time_hour='1'
 
         posts_created=[]
