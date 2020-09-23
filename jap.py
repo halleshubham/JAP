@@ -17,7 +17,7 @@ def get_authors_list(summary_data):
 
 
 
-def get_author(author,creds):
+def get_author_by_slug(author,creds):
     username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
     username = unidecode.unidecode(username_pre)
     protected_url='https://janataweekly.org/wp-json/wp/v2/users?slug='+username
@@ -31,6 +31,30 @@ def get_author(author,creds):
                             resource_owner_key=creds['resource_owner_key'], 
                             resource_owner_secret=creds['resource_owner_secret']
                         )
+    r = oauth.get(protected_url,headers=headers)
+    if len(r.json()) == 0:
+        return False
+    else :
+        author = r.json()[0]['id']
+        return author
+
+
+
+def get_author_by_email(author,creds):
+    username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
+    username = unidecode.unidecode(username_pre)
+    protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+username+'@test.com'
+    headers = { 
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
+                }
+    oauth = OAuth1Session(    
+                            creds['client_key'],
+                            client_secret=creds['client_secret'],
+                            resource_owner_key=creds['resource_owner_key'], 
+                            resource_owner_secret=creds['resource_owner_secret']
+                        )
+
+      
     r = oauth.get(protected_url,headers=headers)
     if len(r.json()) == 0:
         return False
@@ -67,6 +91,44 @@ def create_author(author,creds):
     if r.status_code == 201:
         return r.json()['id']
     else:
+        error = r.json()
+        if error['code'] == 'existing_user_email':
+            existing_author_id = get_author_by_email(author,creds)
+            if existing_author_id:
+                update_status = update_author(author,existing_author_id,creds)
+                if update_status:
+                    return True
+                else:    
+                    return False
+        else:
+            pprint(error)
+            return False
+
+
+
+def update_author(author,existing_author_id,creds):
+    username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
+    username = unidecode.unidecode(username_pre)
+    protected_url='https://janataweekly.org/wp-json/wp/v2/users/'+str(existing_author_id)
+    headers = { 
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                     
+                }
+    data={
+            'first_name' : author ,
+            'slug' : username
+
+            }
+    oauth = OAuth1Session(    
+                            creds['client_key'],
+                            client_secret=creds['client_secret'],
+                            resource_owner_key=creds['resource_owner_key'],
+                            resource_owner_secret=creds['resource_owner_secret']
+                        )
+    r = oauth.post(protected_url,headers=headers,data=data)
+    if r.status_code == 200:
+        return r.json()['id']
+    else:
         print(r.json())
         return False
 
@@ -76,7 +138,7 @@ def add_authors(authors_list,creds):
     author_ids=[]
     author_added_count=0
     for author in authors_list:
-        author_id=get_author(author,creds)
+        author_id=get_author_by_slug(author,creds)
         if not author_id:
             author_id=create_author(author,creds)
             if author_id:
