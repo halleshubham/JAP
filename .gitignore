@@ -4,3 +4,4 @@ JAP_Authentication/jap_config.json
 jap/
 .vscode/
 author_test.py
+issue_params.json
