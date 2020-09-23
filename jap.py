@@ -94,33 +94,35 @@ def add_authors(authors_list,creds):
 
 
 
-def upload_images(folder_path,creds):
-    protected_url='https://janataweekly.org/wp-json/wp/v2/media/'
-    headers = { 
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
-                }
-    image_ids={}
-    for image_file in os.listdir(folder_path):
-        data ={
-            'file': open(folder_path+image_file,'rb')
-        }
- 
-        oauth = OAuth1Session(    
-                                creds['client_key'],
-                                client_secret=creds['client_secret'],
-                                resource_owner_key=creds['resource_owner_key'],
-                                resource_owner_secret=creds['resource_owner_secret']
-                            )
-        r = oauth.post(protected_url,headers=headers,files=data)
-        if r.status_code!=201:
-            print('Image "' + image_file +'" could not be uploaded')
-            print(r.content)
-            return {'status':False,'image_ids':image_ids}
-
-        image_number=image_file.split('.')[0]
-        image_ids[image_number]=r.json()['id']
-        print('Image "' + image_file +'" uploaded successfully')    
-    return {'status':True,'image_ids':image_ids}
+def upload_images(folder_path,creds,author_ids_list_length):
+    if len(os.listdir(folder_path))==author_ids_list_length:
+        protected_url='https://janataweekly.org/wp-json/wp/v2/media/'
+        headers = { 
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
+                    }
+        image_ids={}
+        for image_file in os.listdir(folder_path):
+            data ={
+                'file': open(folder_path+image_file,'rb')
+            }
+    
+            oauth = OAuth1Session(    
+                                    creds['client_key'],
+                                    client_secret=creds['client_secret'],
+                                    resource_owner_key=creds['resource_owner_key'],
+                                    resource_owner_secret=creds['resource_owner_secret']
+                                )
+            r = oauth.post(protected_url,headers=headers,files=data)
+            if r.status_code!=201:
+                print('Image "' + image_file +'" could not be uploaded')
+                print(r.content)
+                return {'status':False,'message':'Error uploading image'}
+            image_number=image_file.split('.')[0]
+            image_ids[image_number]=r.json()['id']
+            print('Image "' + image_file +'" uploaded successfully')    
+        return {'status':True,'image_ids':image_ids}
+    else:
+        return {'status':False,'message':'Number of images and articles does not match!'}
 
 def delete_images(id_list,creds):
     headers = { 
@@ -134,9 +136,11 @@ def delete_images(id_list,creds):
                                 resource_owner_secret=creds['resource_owner_secret']
                             )
     for id in id_list:
-        protected_url='https://janataweekly.org/wp-json/wp/v2/media/'+str(id)
+        protected_url='https://janataweekly.org/wp-json/wp/v2/media/'+str(id)+'?force=true'
         r = oauth.delete(protected_url,headers=headers)
-        print(r.status_code)
+        if r.status_code!=200:
+            print(r.status_code)
+            print(r.text)
         #print(r.josn())
     print("Deleted old images!")
 
@@ -156,6 +160,7 @@ def create_post(data,creds):
 
     r = oauth.post(protected_url,headers=headers,data=data)
     if r.status_code!=201:
+        print(r.text)
         return False
     else:
         return True
