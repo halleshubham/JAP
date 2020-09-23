@@ -41,7 +41,13 @@ def getImages(summary):
 
         time.sleep(10)
 
-        imageBiggerSize = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,'//*[@id="Sva75c"]/div/div/div[3]/div[2]/c-wiz/div[1]/div[1]/div/div[2]/a/img')))
+        try: 
+            imageBiggerSize = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,'//*[@id="Sva75c"]/div/div/div[3]/div[2]/c-wiz/div[1]/div[1]/div/div[2]/a/img')))
+        except: 
+            img = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[2]/c-wiz/div[3]/div[1]/div/div/div/div/div[1]/div[1]/div[1]/a[1]/div[1]/img')))
+            img.click()
+            imageBiggerSize = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,'//*[@id="Sva75c"]/div/div/div[3]/div[2]/c-wiz/div[1]/div[1]/div/div[2]/a/img')))
+        
         classTxt = imageBiggerSize.get_attribute('class')
         forGettingLink = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.CLASS_NAME,classTxt)))
         url = forGettingLink.get_attribute("src")
@@ -90,8 +96,20 @@ def getImages(summary):
             output.write(resource.read())
             output.close()
         except:
-            count += 1
-            continue
+            try:
+                resource =urllib.request.urlopen(url)
+                outputPNG= open (str(count)+".png","wb")
+                outputPNG.write(resource.read())
+                outputPNG.close()
+            except:
+                try:
+                    resource =urllib.request.urlopen(url)
+                    outputjpeg= open (str(count)+".jpeg","wb")
+                    outputjpeg.write(resource.read())
+                    outputjpeg.close()
+                except:
+                    count += 1
+                    continue
         count += 1
     return imagepaths
 
