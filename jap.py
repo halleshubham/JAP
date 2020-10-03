@@ -19,7 +19,7 @@ def get_authors_list(summary_data):
 
 def get_author_by_slug(author,creds):
     username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
-    username = unidecode.unidecode(username_pre)
+    username = unidecode.unidecode(username_pre)[:49]
     protected_url='https://janataweekly.org/wp-json/wp/v2/users?slug='+username
 
     headers = { 
@@ -42,7 +42,7 @@ def get_author_by_slug(author,creds):
 
 def get_author_by_email(author,creds):
     username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
-    username = unidecode.unidecode(username_pre)
+    username = unidecode.unidecode(username_pre)[:49]
     protected_url='https://janataweekly.org/wp-json/wp/v2/users?search='+username+'@test.com'
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
@@ -71,7 +71,7 @@ def create_author(author,creds):
                      
                 }
     username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
-    username = unidecode.unidecode(username_pre)
+    username = unidecode.unidecode(username_pre)[:49]
 
     email=username+'@test.com'
     data={
@@ -108,7 +108,7 @@ def create_author(author,creds):
 
 def update_author(author,existing_author_id,creds):
     username_pre=''.join(e for e in author if e.isalnum()) # for removing all the special charathers 
-    username = unidecode.unidecode(username_pre)
+    username = unidecode.unidecode(username_pre)[:49]
     protected_url='https://janataweekly.org/wp-json/wp/v2/users/'+str(existing_author_id)
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
@@ -178,13 +178,13 @@ def upload_images(folder_path,creds,author_ids_list_length):
             if r.status_code!=201:
                 print('Image "' + image_file +'" could not be uploaded')
                 print(r.content)
-                return {'status':False,'message':'Error uploading image'}
+                return {'status':False,'image_ids':image_ids,'message':'Error uploading image'}
             image_number=image_file.split('.')[0]
             image_ids[image_number]=r.json()['id']
             print('Image "' + image_file +'" uploaded successfully')    
         return {'status':True,'image_ids':image_ids}
     else:
-        return {'status':False,'message':'Number of images and articles does not match!'}
+        return {'status':False,'image_ids':image_ids,'message':'Number of images and articles does not match!'}
 
 def delete_images(id_list,creds):
     headers = { 
