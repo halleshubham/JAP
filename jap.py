@@ -184,7 +184,7 @@ def upload_images(folder_path,creds,author_ids_list_length):
             print('Image "' + image_file +'" uploaded successfully')    
         return {'status':True,'image_ids':image_ids}
     else:
-        return {'status':False,'image_ids':[],'message':'Number of images and articles does not match!'}
+        return {'status':False,'image_ids':{},'message':'Number of images and articles does not match!'}
 
 def delete_images(id_list,creds):
     headers = { 
