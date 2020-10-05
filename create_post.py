@@ -88,7 +88,8 @@ if creds:
                         else:
                             posts_not_created.append(article_title)
                     
-                    except :
+                    except Exception as e:
+                        print(e)
                         print("Could not create the draft for the article "+article_title)
                         delete_images(list(image_dict['image_ids'].values()),creds)
                         posts_not_created.append(article_title)
