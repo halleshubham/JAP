@@ -46,6 +46,8 @@ if creds:
         posts_not_created=[]
 
         if image_dict['status']:
+                print_edition_articles = params["print_edition_articles"]
+                blog_edition_articles = params["blog_edition_articles"]
                 image_ids=image_dict['image_ids']
                 print(image_ids)
                 print('\n------------------------------------------------------------\n')
@@ -70,6 +72,13 @@ if creds:
                         article_image_id=image_ids[str(int(i)+1)]
                         article_author_id=authors_ids[i]
 
+                        if (i+1) >= print_edition_articles[0] and (i+1) <= print_edition_articles[1]:
+                            categories = "669" #id for published category
+                        elif (i+1) >= blog_edition_articles[0] and (i+1) <= blog_edition_articles[1]:
+                            categories = "521" #id for blog category
+                        else: 
+                            categories = "521" 
+
                         data={
                                 'status':'draft',
                                 'title' : article_title,
@@ -78,7 +87,8 @@ if creds:
                                 'excerpt' : article_exerpt,
                                 'featured_media':article_image_id,
                                 'author': article_author_id,
-                                'date': article_date
+                                'date': article_date,
+                                'categories' : categories
                             }
 
                         create_post_status = create_post(data,creds)
@@ -88,7 +98,8 @@ if creds:
                         else:
                             posts_not_created.append(article_title)
                     
-                    except :
+                    except Exception as e:
+                        print(e)
                         print("Could not create the draft for the article "+article_title)
                         delete_images(list(image_dict['image_ids'].values()),creds)
                         posts_not_created.append(article_title)

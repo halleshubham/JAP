@@ -19,7 +19,24 @@ An automation tool for creating draft posts on Wordpress using Rest API.
 
 
 ## Creating draft posts
-1.  Update following strings in **create_post.py** :
+1. Create **issue_params.json** if not already present in the **root folder** where **create_post.py** is present and update the fields accordingly:
+
+            {
+                 
+                "summaryfile" : "path/to/summaryfile",
+
+                "articles_folder_path" : "path/to/articles/folder",
+
+                "images_folder_path" : "path/to/images/folder",
+
+                "publish_date" : "YYYY-MM-DD",
+
+                "print_edition_articles" : [<print edition first article number>,<print edition last article number>],
+
+                "blog_edition_articles" : [<blog edition first article number>,<blog edition last article number>]
+            }                  
+           
+    Note :
     - ***summaryfile*** : Full path to summary.docx file. 
     - ***articles_folder_path*** : Full path to the folder containing only articles files for the current issue.
     - ***images_folder_path*** : Full path to the folder containing only images for the current issue.  
