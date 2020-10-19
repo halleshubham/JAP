@@ -73,10 +73,10 @@ if creds:
                         article_author_id=authors_ids[i]
 
                         if (i+1) >= print_edition_articles[0] and (i+1) <= print_edition_articles[1]:
-                            categories = "669"
+                            categories = "669" #id for published category
                         elif (i+1) >= blog_edition_articles[0] and (i+1) <= blog_edition_articles[1]:
-                            categories = "521"
-                        else:
+                            categories = "521" #id for blog category
+                        else: 
                             categories = "521" 
 
                         data={
