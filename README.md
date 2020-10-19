@@ -20,6 +20,7 @@ An automation tool for creating draft posts on Wordpress using Rest API.
 
 ## Creating draft posts
 1. Create **issue_params.json** if not already present and update the fields accordingly:
+
             {
                  
                 "summaryfile" : "path/to/summaryfile",
