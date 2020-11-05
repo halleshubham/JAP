@@ -3,3 +3,7 @@ jap_config.json
 *.html
 TwitterAccountsData.json
 *.jpg
+*.docx
+*.doc
+*.zip
+*.json

@@ -65,7 +65,7 @@ def getTags(id):
 	tags1 = ""
 	for i in data:
 		tag1 = i["name"].replace(" ", "")
-		tag1 = tag1.replace("-", "_")            
+		tag1 = tag1.replace("-", "_")           
 		tags1 += "#"+tag1+" "
 	print (tags1)
 	return (tags1)
@@ -186,7 +186,8 @@ def publishingAllArticles(dates,pageID,access_token,summary,postsTobeDeleted):
 	excerpt=summary[0]['excerpts']
 	title=summary[0]['titles']
 	l=len(author)
-
+	if (l >29):
+		l = 29
 	for i in range(l,-1,-1):
 		currentIssueDate = datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()
 		if (issueDate == currentIssueDate):
@@ -202,6 +203,8 @@ def publishingAllArticles(dates,pageID,access_token,summary,postsTobeDeleted):
 			else:		
 				eachPostTime[i]=nineAM
 				nineAM += 86400
+		else:
+			print ("UDy")
 
 	j=0
 
@@ -220,7 +223,7 @@ def publishingAllArticles(dates,pageID,access_token,summary,postsTobeDeleted):
 			link = data[i]["link"]
 			photoId  = data[i]["featured_media"]
 			murl = getDifferentPhotoURL(photoId)
-			currentID=publishArticle(strF1,eachPostTime[i],link,murl["actual_size"],pageID,access_token)
+			currentID = publishArticle(strF1,eachPostTime[i],link,murl["actual_size"],pageID,access_token)
 			attachMent = getArticleAttachment(currentID["id"],access_token)
 			attachmentName = "attachments"
 			graph = facebook.GraphAPI(access_token=access_token)

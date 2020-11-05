@@ -18,7 +18,7 @@ with open(creds_path, encoding='utf-8-sig')  as f:
 
 summary = get_summary_data(creds["File_path"])
 
-#publishing_articles_on_FB = publishingAllArticles(creds["dates"],creds["graph_Page_ID"],creds["graph_API_Key"],summary,creds["YesDeletePosts"])
+publishing_articles_on_FB = publishingAllArticles(creds["dates"],creds["graph_Page_ID"],creds["graph_API_Key"],summary,creds["YesDeletePosts"])
 
 getting_All_Articles_For_Janata_Whatsapp_By_Parts=whatsapp_Articles_By_Part(summary)
 

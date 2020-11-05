@@ -15,7 +15,7 @@ def getAuthorName(id):
 	res = conn.getresponse()
 	data = json.loads(res.read())
 	return data["name"]
-    
+
 def getTags(id):
 	conn = http.client.HTTPSConnection("janataweekly.org")
 

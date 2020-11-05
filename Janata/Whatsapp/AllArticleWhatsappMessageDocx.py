@@ -65,9 +65,11 @@ for para in document.paragraphs:
             title1=title1.split('. ',1)
             title.append(unicodedata.normalize("NFKD",title1[1]))
             continue
+
         if (len(excerpt)==len(author)) and (len(excerpt)!=len(title)):
             author.append(unicodedata.normalize("NFKD",para.text))
             continue
+
         if (len(author)==len(title)) and (len(excerpt)!=len(author)):
             excerpt.append(unicodedata.normalize("NFKD",para.text))
             continue

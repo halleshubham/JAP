@@ -78,6 +78,7 @@ def whatsapp_Articles_By_Part(summary):
 
 				strF3 += "\n✒️ _"+author[j-1]+"_\n\n"
 				#strF3 += "📋 _"+excerpt[j-1]+"_\n\n"
+
 				if (i != (lowerLimit+1)):
 					strF3 += data[i]["link"] +"\n-----------------------------------------------------------\n\n" # + "\n IMAGE: " + \
 				else:

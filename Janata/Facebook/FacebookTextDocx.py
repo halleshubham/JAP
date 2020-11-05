@@ -24,6 +24,8 @@ def get_Facebook_Txt_For_Kedar(summary):
 	refDateObj = datetime.datetime.strptime(data[0]["date"],'%Y-%m-%dT%H:%M:%S')
 	l=len(author)
 	j=0
+	if (l>29):
+		l=29
 	i=l
 	strF1=''
 	while j<l:

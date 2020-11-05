@@ -31,7 +31,7 @@ def getArticlesDeleted(toBeDeleted,pageID,access_token):
 		q=q+1
 	print("Completed")
 
-creds_path="jap_conf.json"
+creds_path="For FB.json"
 with open(creds_path, encoding='utf-8-sig')  as f:
         creds=json.load(f)
 
