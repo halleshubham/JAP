@@ -61,8 +61,8 @@ if creds:
                         except Exception as e:
                             print(e)
 
-
-                        publish_min=str(summary_data[i]['article_number'])   
+                        total_articles = len(image_ids)
+                        publish_min=str((total_articles + 1) - int(summary_data[i]['article_number']))   #for publishing the articles in reverse order
                         date_str=publish_date+'T'+publish_time_hour+':'+publish_min+':00'
                         article_date=datetime.strptime(date_str,'%Y-%m-%dT%H:%M:%S')  
 
@@ -73,6 +73,7 @@ if creds:
                         article_author_id=authors_ids[i]
 
                         if (i+1) >= print_edition_articles[0] and (i+1) <= print_edition_articles[1]:
+                            print("category for artice : " +str(i+1)+" "+str(print_edition_articles[0]))
                             categories = "669" #id for published category
                         elif (i+1) >= blog_edition_articles[0] and (i+1) <= blog_edition_articles[1]:
                             categories = "521" #id for blog category
