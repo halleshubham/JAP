@@ -2,6 +2,7 @@ import http.client
 import json
 import datetime
 import re
+from pprint import pprint
 
 def getAuthorName(id):
 	conn = http.client.HTTPSConnection("janataweekly.org")
@@ -63,7 +64,7 @@ headers = {
 	'cache-control': "no-cache"
 	}
 
-conn.request("GET", "/wp-json/wp/v2/posts?per_page=40")
+conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=669")
 res = conn.getresponse()
 data = json.loads(res.read())
 
@@ -187,6 +188,11 @@ def renderCoverArticle(data):
 	coverArticle = '''
 	<!--COVER ARTICLE-->
                     <table class="section header" cellpadding="0" cellspacing="0" width="600">
+                      <tr>
+                            <td class="column"  align="center">
+                                <h3 style="box-sizing:border-box;margin:0px;font-weight:500;line-height:1.6;font-size:1.75rem;background:yellow">Print Issue</h3>
+                            </td>   
+                        </tr>  
                         <tr>
                             <td class="column">
                                 <table>
@@ -369,7 +375,7 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
 
 coverFlag = False
 
-for i in range(30,-1,-1):
+for i in range(0,30):
 	print(data[i]["author"])
 	if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
 		if coverFlag == False :
@@ -377,14 +383,14 @@ for i in range(30,-1,-1):
 			strF += appealJoinJanatWeekly
 			coverFlag = True
 		else:
-			if (i%2) == 0:
+			if (i%2) == 0 :
 				strF += '''	<!-- Two columns -->
                     <table class="section mt-3" cellpadding="0" cellspacing="0">
                         <tr>'''
 
 			strF += renderInternalArticle(data[i])
 
-			if (i%2) == 1 or i==0:
+			if (i%2) == 1 or i==0 :
 				strF += ''' </tr>
                     </table>'''
 
