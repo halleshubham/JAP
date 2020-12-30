@@ -3,3 +3,5 @@ jap_config.json
 *.html
 TwitterAccountsData.json
 *.jpg
+**/__pychache__/
+issues_params.json
