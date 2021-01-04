@@ -3,7 +3,7 @@ import json
 import datetime
 import re
 
-issue_date = '2020-12-27'
+issue_date = '2021-01-03'
 
 
 conn = http.client.HTTPSConnection("janataweekly.org")
@@ -14,14 +14,14 @@ headers = {
 	}
 
 #Print Issue Data
-conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=669&before="+ issue_date +"T23:59:59")
+conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=669&after="+ issue_date +"T00:00:00")
 res = conn.getresponse()
 print_data = json.loads(res.read())
 
 #Blog Issue Data
-conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=521&before="+ issue_date +"T23:59:59")
-res = conn.getresponse()
-blog_data = json.loads(res.read())
+conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=521&after="+ issue_date +"T00:00:00")
+res1 = conn.getresponse()
+blog_data = json.loads(res1.read())
 
 
 def getAuthorName(id):
@@ -388,56 +388,37 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
 '''
 
 
-def odd_even(data,length, category, strF,coverFlag):
-    if (length % 2) ==0: 
-        for i in range(0,length):
-            #print(print_data[i]["author"])
-            #if (refDateObj.date() - datetime.datetime.strptime(print_data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
-            if coverFlag == False :
-                strF += renderCoverArticle(data[i],category)
-                if category == "Print Issue":
-                    strF += appealJoinJanatWeekly
-                coverFlag = True
-            else:
-                if (i%2) == 1:
-                    strF += '''	<!-- Two columns -->
-                        <table class="section mt-3" cellpadding="0" cellspacing="0">
-                            <tr>'''
-
-                strF += renderInternalArticle(data[i])
-
-                if (i%2) == 0 or i==0:
-                    strF += ''' </tr>
-                        </table>'''
-    else : 
-        for i in range(0,length):
-        #print(data[i]["author"])
-        #if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
-            if coverFlag == False :
-                strF += renderCoverArticle(data[i],category)
+def format_articles(data,length, category, strF,coverFlag):
+    for i in range(0,length):
+        #print(print_data[i]["author"])
+        #if (refDateObj.date() - datetime.datetime.strptime(print_data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
+        if coverFlag == False :
+            strF += renderCoverArticle(data[i],category)
+            if category == "Print Issue":
                 strF += appealJoinJanatWeekly
-                coverFlag = True
-            else:
-                if (i%2) == 0 :
-                    strF += '''	<!-- Two columns -->
-                        <table class="section mt-3" cellpadding="0" cellspacing="0">
-                            <tr>'''
+            coverFlag = True
+        else:
+            if (i%2) == 1:
+                strF += '''	<!-- Two columns -->
+                    <table class="section mt-3" cellpadding="0" cellspacing="0">
+                        <tr>'''
 
-                strF += renderInternalArticle(data[i])
+            strF += renderInternalArticle(data[i])
 
-                if (i%2) == 1 or i==0 :
-                    strF += ''' </tr>
-                        </table>'''
+            if (i%2) == 0 or i==(length-1):
+                strF += ''' </tr>
+                    </table>'''
+  
     return strF 
 
 
 print_length = len(print_data)
 blog_length = len(blog_data)
 coverFlag = False
-strF = odd_even(print_data, print_length, "Print Issue", strF, coverFlag)
+strF = format_articles(print_data, print_length, "Print Issue", strF, coverFlag)
 coverFlag = False
 
-strF = odd_even(blog_data, blog_length, "Blog", strF, coverFlag)
+strF = format_articles(blog_data, blog_length, "Blog", strF, coverFlag)
 
 strF += footerJanata
 strF += endOfHTML
