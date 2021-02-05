@@ -28,17 +28,30 @@ def getDifferentPhotoURL(id):
 	conn.request("GET", "/wp-json/wp/v2/media/"+str(id))
 	res = conn.getresponse()
 	data = json.loads(res.read())
-	photoURL={
-		"actual_size":data["media_details"]["sizes"]["full"]["source_url"],
-	"default":data["media_details"]["sizes"]["sow-carousel-default"]["source_url"],
-	"thumbnail":data["media_details"]["sizes"]["thumbnail"]["source_url"]}
-	#"medium":data[0]["media_details"]["sizes"]["medium"]["source_url"],
+	photoURL = {}
+
 	try:
-		photoURL.add("medium",data["media_details"]["sizes"]["medium"]["source_url"])
+		photoURL["medium"] = data["media_details"]["sizes"]["medium"]["source_url"]
 	except:
 		print("Medium size doesn't exist")
+
 	try:
-		photoURL.add("medium_large",data["media_details"]["sizes"]["medium"]["medium_large"])
+		photoURL["thumbnail"] = data["media_details"]["sizes"]["woocommerce_thumbnail"]["source_url"]
+	except:
+		print("woocommerce_thumbnail size doesn't exist")
+
+	try:
+		photoURL["default"] = data["media_details"]["sizes"]["woocommerce_gallery_thumbnail"]["source_url"]
+	except:
+		print("woocommerce_gallery_thumbnail size doesn't exist")
+
+	try:
+		photoURL["actual_size"] = data["media_details"]["sizes"]["full"]["source_url"]
+	except:
+		print("full size doesn't exist")
+
+	try:
+		photoURL["medium_large"] = data["media_details"]["sizes"]["medium"]["medium_large"]
 	except:
 		print("Medium Large size doesn't exist")
 
@@ -188,8 +201,9 @@ def publishingAllArticles(dates,pageID,access_token,summary,postsTobeDeleted):
 	l=len(author)
 	if (l >29):
 		l = 29
-	for i in range(l,-1,-1):
+	for i in range(0,l):
 		currentIssueDate = datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()
+		#for reverse replace i with l-i-1
 		if (issueDate == currentIssueDate):
 			if ((l-i)<7):
 				eachPostTime[i]=elevenAM
@@ -212,17 +226,19 @@ def publishingAllArticles(dates,pageID,access_token,summary,postsTobeDeleted):
 	author= summary[0]['authors']
 	excerpt=summary[0]['excerpts']
 	title=summary[0]['titles']
-
-	for i in range(l-1,-1,-1):
+#for reverse replace range(l-1,-1,-1) with range(0,l)
+	for i in range(0,l):
 		print(author[i])
 		if (eachPostTime[i]>currentTime):
-			strF1 = title[l-i-1]+"\n\n"
-			strF1 += author[l-i-1]+"\n\n"+excerpt[l-i-1]+"\n\n"
+			#for reverse replace i with l-i-1
+			strF1 = title[i]+"\n\n"
+			strF1 += author[i]+"\n\n"+excerpt[i]+"\n\n"
 			strF1 += data[i]["link"] +"\n\n"
 			strF1 += getTags(data[i]["id"])
 			link = data[i]["link"]
 			photoId  = data[i]["featured_media"]
 			murl = getDifferentPhotoURL(photoId)
+			print (strF1,"\n")
 			currentID = publishArticle(strF1,eachPostTime[i],link,murl["actual_size"],pageID,access_token)
 			attachMent = getArticleAttachment(currentID["id"],access_token)
 			attachmentName = "attachments"
@@ -253,7 +269,7 @@ def publishingAllArticles(dates,pageID,access_token,summary,postsTobeDeleted):
 						print("No method works, must do manually",)
 
 			id.append(currentID)
-			uday="rockes"
+			uday="rocks"
 		j=j+1
 
 	q=0

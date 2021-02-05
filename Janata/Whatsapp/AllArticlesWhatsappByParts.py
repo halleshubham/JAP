@@ -53,39 +53,42 @@ def whatsapp_Articles_By_Part(summary):
 			l=l+1
 	'''
 	rem=0
-	upperLimit = l-1
-	lowerLimit = upperLimit - everyDayArticleNumber
+	upperLimit = everyDayArticleNumber
+	lowerLimit = 0
+	#lowerLimit = upperLimit - everyDayArticleNumber
 
 	for k in range(0,parts,1):
 		if (k < reminder):
 			rem = 1
 		else:
 			rem = 0
-		lowerLimit -= rem
+		upperLimit += rem
 
-		for i in range(upperLimit,lowerLimit,-1):
+		for i in range(lowerLimit,upperLimit,1):
 			if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
 
-				strF3 += getSymbols(j)+" *"+title[j-1]+"*\n"
+				strF3 += getSymbols((1+int(i)))+" *"+title[i]+"*\n"
 
-				b= author[j-1][-1]
+				b= author[i][-1]
 				if (b == ' '):
-					author[j-1] = author[j-1][:-1]
+					author[i] = author[i][:-1]
 
-				a= excerpt[j-1][-1]
+				a= excerpt[i][-1]
 				if (a == ' '):
-					excerpt[j-1] = excerpt[j-1][:-1]
+					excerpt[i] = excerpt[i][:-1]
 
-				strF3 += "\n✒️ _"+author[j-1]+"_\n\n"
+				strF3 += "\n✒️ _"+author[i]+"_\n\n"
 				#strF3 += "📋 _"+excerpt[j-1]+"_\n\n"
 
-				if (i != (lowerLimit+1)):
+				if (i != (upperLimit-1)):
 					strF3 += data[i]["link"] +"\n-----------------------------------------------------------\n\n" # + "\n IMAGE: " + \
 				else:
 					strF3 += data[i]["link"]
 				j=j+1
-		upperLimit = lowerLimit
-		lowerLimit -= everyDayArticleNumber
+		lowerLimit = upperLimit
+		#upperLimit = lowerLimit
+		upperLimit += everyDayArticleNumber
+		#lowerLimit -= everyDayArticleNumber
 		print (strF3)
 
 		ntrF3 = "\n➖➖➖➖➖➖➖➖➖➖➖\n\n📋 *About Janata Weekly :*\nJanata Weekly is an *independent socialist journal*. It has raised its challenging voice of principled dissent against all conduct and practice that is detrimental to the cherished values of nationalism, democracy, secularism and socialism, while upholding the integrity and the ethical norms of healthy journalism. It has the enviable reputation of being the oldest continuously published socialist journal in India."
@@ -100,7 +103,8 @@ def whatsapp_Articles_By_Part(summary):
 
 		#ntrF1= ntrF[ : N] + '*Part '+str(i)+'*\n' + ntrF[N : ] + strF1 + ntrF3
 		#ntrF2= ntrF[ : N] + '*Part 2*\n' + ntrF[N : ] + strF2 + ntrF3
-		ntrF4= ntrF[ : N] + '*Part '+str(k+1)+'*\n' + ntrF[N : ] + strF3 + ntrF3
+
+		ntrF4= ntrF[ : N] + '*Part '+str(k+1)+' of '+ str(parts)+'*\n' + ntrF[N : ] + strF3 + ntrF3
 		print (ntrF4)
 		f1 = open("whatsappMessage"+str(k+1)+".txt","w",encoding="UTF-8")
 		f1.write(ntrF4)

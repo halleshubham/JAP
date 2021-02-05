@@ -1,9 +1,9 @@
-jap_config.json
+
 *.txt
 *.html
-TwitterAccountsData.json
 *.jpg
 *.docx
 *.doc
 *.zip
+*.jpeg
 *.json

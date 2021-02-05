@@ -13,6 +13,9 @@ import urllib
 import json
 import time
 import os,docx
+import mammoth
+import re
+from bs4 import BeautifulSoup
 
 #http://www.janataweekly.org/wp-admin
 
@@ -20,24 +23,67 @@ def convertDocxToHtml (directory,filename):
     docxFilePath = directory+'//'+filename
     article = docx.Document(docxFilePath)
     html = ''
+    with open(docxFilePath, "rb") as docx_file:
+        result = mammoth.convert_to_html(docx_file)
+        article_content = result.value
+        with open("file.html", "w", encoding="utf-8") as file:
+            file.write(article_content)
+        soup = BeautifulSoup(article_content,'html.parser')
+    bullet =''
     for para in article.paragraphs:
-        for run in para.runs:
-            if run.font.size == Pt(14):
-                if para.text != '' and (para.text != ' '):
-                    if para.alignment == 1:
-                        html += '<p class="has-text-align-center">'+para.text+'</p>'
-                    elif para.alignment == 2:
-                        html += '<p class="has-text-align-right">'+para.text+'</p>'
-                    else:
+        if para.text != '' and (para.text != ' '):
+            text = ".*"+para.text+"*."
+            cool = soup.find('p',text = re.compile(text))
+            div = soup.find_all(string = para.text)
+            if (para.runs[0].font.size == Pt(12)) or (para.runs[0].font.size == None):
+                print ('\n'+ para.style.name)
+                if para.alignment == 1:
+                    cool['class'] = "has-text-align-center"
+                    #if (bullet == ''):
+                    #    if ((para.runs[0].font.italic == True) and (para.runs[0].font.bold == False)):
+                    #        html += '<p class="has-text-align-center"><em>'+para.text+'</em></p>'
+                    #    elif (para.runs[0].font.bold == True)  and (para.runs[0].font.italic == False):
+                    #        html += '<p class="has-text-align-center"><strong>'+para.text+'</strong></p>'
+                    #    elif (para.runs[0].font.bold == True)  and (para.runs[0].font.italic == False):
+                    #        html += '<p class="has-text-align-center"><em><strong>'+para.text+'</strong></em></p>'
+                    #    else:
+                    #        html += '<p class="has-text-align-center">'+para.text+'</p>'
+                    #elif (bullet != ''):
+                    #    html += '<ul>'+bullet+'</ul>'
+                    #    html += '<p class="has-text-align-center">'+para.text+'</p>'
+                    #    bullet =''
+                elif para.alignment == 2:
+                    cool['class'] = "has-text-align-right"
+                    #if (bullet == ''):
+                    #    if ((para.runs[0].font.italic == True) and (para.runs[0].font.bold == False)):
+                    #        html += '<p class="has-text-align-right"><em>'+para.text+'</em></p>'
+                    #    elif (para.runs[0].font.bold == True)  and (para.runs[0].font.italic == False):
+                    #        html += '<p class="has-text-align-right"><strong>'+para.text+'</strong></p>'
+                    #    elif (para.runs[0].font.bold == True)  and (para.runs[0].font.italic == False):
+                    #        html += '<p class="has-text-align-right"><em><strong>'+para.text+'</strong></em></p>'
+                    #    else:
+                    #        html += '<p class="has-text-align-right">'+para.text+'</p>'
+                    #elif (bullet != ''):
+                    #    html += '<ul>'+bullet+'</ul>'
+                    #    html += '<p class="has-text-align-right">'+para.text+'</p>'
+                    #    bullet =''
+
+                elif para.style == 'List Bullet':
+                    bullet += '<li'+para.text+'</li>'
+                else:
+                    if (bullet == ''):
                         html += '<p>'+para.text+'</p>'
-            if run.font.size == Pt(16):
-                if para.text != '' and (para.text != ' '):
-                    if para.alignment == 1:
-                        html += '<h2 class="has-text-align-center">'+para.text+'</h2>'
-                    elif para.alignment == 2:
-                        html += '<h2 class="has-text-align-right">'+para.text+'</h2>'
-                    else:
-                        html += '<h2>'+para.text+'</h2>'
+                    elif (bullet != ''):
+                        html += '<ul>'+bullet+'</ul>'
+                        html += '<p>'+para.text+'</p>'
+                        bullet =''
+            elif para.runs[0].font.size == Pt(14):
+                if para.alignment == 1:
+                    html += '<h2 class="has-text-align-center">'+para.text+'</h2>'
+                elif para.alignment == 2:
+                    html += '<h2 class="has-text-align-right">'+para.text+'</h2>'
+                else:
+                    html += '<h2>'+para.text+'</h2>'
     return html
 
 def editWordpressArticles(directory,summary,userName,pass1word):

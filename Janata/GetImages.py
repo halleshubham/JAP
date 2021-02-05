@@ -1,4 +1,5 @@
 import requests
+import shutil
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver 
 from selenium.webdriver.support.ui import WebDriverWait 
@@ -10,6 +11,7 @@ from GeneralSummaryWithCreds import get_summary_data
 import urllib
 import json
 import time
+import wget
 
 def getAnotherImage(title,driver):
     textBox = driver.find_element_by_xpath('//input[@title="Search"]')
@@ -52,6 +54,7 @@ def getAnotherImage(title,driver):
     textBox.clear()
        
     try:
+        image_file = wget.download(url)
         resource =urllib.request.urlopen(url)
         output = open(str(count)+".jpg","wb")
         output.write(resource.read())
@@ -112,37 +115,6 @@ def getImages(summary):
         url = forGettingLink.get_attribute("src")
         imagepaths.append(url)
 
-        #actionChains = ActionChains(driver)
-        #actionChains.context_click(imageBiggerSize).perform()
-
-        #actionChains.send_keys('v')
-        #actionChains.perform()
-        #actionChains.send_keys('v').perform()
-        #actionChains.context_click(imageBiggerSize).key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-
-        #actionChains.context_click(imageBiggerSize).send_keys(Keys.ARROW_DOWN,Keys.RETURN)
-        #actionChains.perform()
-        
-        #actionChains.context_click(imageBiggerSize).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ARROW_DOWN).send_keys(Keys.ENTER).perform()
-        #actionChains.perform()
-        
-        '''
-        parentGUID = driver.current_window_handle
-        imageBiggerSize.click()
-        #href = imageBiggerSize.get_attribute('href')
-        #driver.get(href)
-        time.sleep(7)
-    
-        allGUID = driver.window_handles
-
-        for guid in allGUID:
-            if(guid != parentGUID):
-                driver.switch_to_window(guid)
-                #/html/body/div[1]/div[4]/div/div[1]/article/div[1]/figure/img
-                #//*[@id="post-16963"]/div[1]/figure/img
-        imageWebsite = driver.find_element_by_xpath('/html/body/div[1]/div[4]/div/div[1]/article/div[1]/figure/img')
-        src = imageWebsite.get_attribute('src')
-        '''
         closeBigImage = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'//a[@aria-label="Close"]')))
         closeBigImage.click()
 
@@ -150,30 +122,36 @@ def getImages(summary):
         textBox.clear()
        
         try:
-            resource =urllib.request.urlopen(url)
+            resource =urllib.request.urlopen(url, timeout=20)
             output = open(str(count)+".jpg","wb")
             output.write(resource.read())
             output.close()
         except Exception as e:
             print (e)
+            image_url = url
+            #try:
+            #    image_file = wget.download(url)
+            #except Exception as e:
+            #    print (e)
+            filename = str(count)+".jpeg"
             try:
-                resource =urllib.request.urlopen(url)
-                outputPNG= open (str(count)+".png","wb")
-                outputPNG.write(resource.read())
-                outputPNG.close()
+
+            # Open the url image, set stream to True, this will return the stream content.
+                r = requests.get(image_url, stream = True,timeout = 15)
+
+                # Check if the image was retrieved successfully
+                if r.status_code == 200:
+                    # Set decode_content value to True, otherwise the downloaded image file's size will be zero.
+                    r.raw.decode_content = True
+    
+                    # Open a local file with wb ( write binary ) permission.
+                    with open(filename,'wb') as f:
+                        shutil.copyfileobj(r.raw, f)
+        
+                    print('Image sucessfully Downloaded: ',filename)
             except Exception as e:
-                print (e)
-                try:
-                    resource =urllib.request.urlopen(url)
-                    outputjpeg= open (str(count)+".jpeg","wb")
-                    outputjpeg.write(resource.read())
-                    outputjpeg.close()
-                except Exception as e:
-                    print (e,'\n')
-                    anotherImage = getAnotherImage(searchText,driver)
-                    print (anotherImage,'\n')
-                    count += 1
-                    continue
+                print(e, 'Image Couldn\'t be retreived\n')
+
         count += 1
     return imagepaths
 

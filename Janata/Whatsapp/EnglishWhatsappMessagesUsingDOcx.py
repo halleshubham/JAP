@@ -44,7 +44,7 @@ def LokayatEnglishWhatsapp(summary):
 		i=i-1
 	print (strF1)
 
-	f3 = open("EnglishWhatsappMessagesUsingDocx.docx","w",encoding="UTF-8")
+	f3 = open("EnglishWhatsappMessagesUsingDocx.txt","w",encoding="UTF-8")
 	f3.write(strF1)
 	f3.close()
 

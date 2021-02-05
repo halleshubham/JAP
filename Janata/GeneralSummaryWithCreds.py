@@ -2,14 +2,13 @@
 import json
 import unicodedata
 
-
 def get_summary_data(filepath):
     doc = docx.Document(filepath)
     summary_data=[]
     author=[]
     excerpt=[]
     title=[]
-    for para in doc.paragraphs:
+    for para in doc.paragraphs[1:]:
         
         if (para.text != '') and (para.text != ' '):
             if (len(author)== len(excerpt)==len(title)): 
@@ -22,8 +21,17 @@ def get_summary_data(filepath):
                 continue
             if (len(author)==len(title)) and (len(excerpt)!=len(author)):
                 excerpt.append(unicodedata.normalize("NFKD",para.text))
-                continue
-        
+                continue 
+
+    #n = len(title)
+    #Newauthor=[None] * n
+    #Newexcerpt=[None] * n
+    #Newtitle=[None] * n
+    #for i in range(0,n):
+    #    Newauthor[i] =author[n-1-i]
+    #    Newexcerpt[i] =excerpt[n-1-i]
+    #    Newtitle[i] =title[n-1-i]
+
     summary_data.append(
                         {
                             'titles' : title,
