@@ -3,7 +3,7 @@ import json
 import datetime
 import re
 
-issue_date = '2021-03-04'
+issue_date = '2021-01-24'
 
 
 conn = http.client.HTTPSConnection("janataweekly.org")
@@ -37,18 +37,20 @@ def getAuthorName(id):
 	data = json.loads(res.read())
 	return data["name"]
 
-def renderInternalArticle(data):
-	internalArticle = '''<td class="column p-1" width="290" valign="top">
+def renderLeftInternalArticle(data):
+	internalArticle = '''<td class="column p-1" width="600" cellpadding="0" cellspacing="0" valign="top">
                                 <table>
                                     <tbody>
                                         <tr>
-                                            <td align="center">
+                                            <td align="left" width="50%" style="padding: 10px">
                                                 <div class="hero-unit">
                                                     <div id="cover-image">
                                                         <a href="'''+data["link"]+'''">
                                                             <img class="img-fluid" src="'''+data["jetpack_featured_media_url"]+'''" />
                                                         </a>
                                                     </div>
+                                            </td>
+                                            <td>
                                                     <div class="mt-1">
                                                         <h5>'''+data["title"]["rendered"]+'''</h5>
                                                     </div>
@@ -77,6 +79,49 @@ def renderInternalArticle(data):
                             </td>'''
 	return internalArticle
 
+def renderRightInternalArticle(data):
+	internalArticle = '''<td class="column p-1" width="600" cellpadding="0" cellspacing="0" valign="top">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                          
+                                            <td>
+                                                    <div class="mt-1">
+                                                        <h5>'''+data["title"]["rendered"]+'''</h5>
+                                                    </div>
+                                                    <div style="color:#ED00D1;" class="mt-1">
+                                                        <h6>by
+                                                            <b>
+                                                                <i>'''+getAuthorName(data["author"])+'''</i>
+                                                            </b>
+                                                        </h6>
+                                                    </div>
+                                                    <div class="mt-1">
+                                                        <p>
+                                                            <p>'''+data["excerpt"]["rendered"]+''' </p>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <a href="'''+data["link"]+'''">
+                                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">Read full article</button>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                              <td align="right" width="50%" style="padding: 10px">
+                                                <div class="hero-unit">
+                                                    <div id="cover-image">
+                                                        <a href="'''+data["link"]+'''">
+                                                            <img class="img-fluid" src="'''+data["jetpack_featured_media_url"]+'''" />
+                                                        </a>
+                                                    </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>'''
+	return internalArticle
 
 
 
@@ -195,6 +240,41 @@ aboutJanata = '''<!-- Header image -->
                             </td>
                         </tr>
                     </table>'''
+
+contributeAppeal='''<!-- Contribute Janata -->
+                <br>
+                    <table width = "600" style="border:1px solid #ED00D1;" >
+                        <tr>
+                            <td style="padding: 5px;">
+                            <div class="mt-1" >
+                                <h4 style="color: #ED00D1;"><b>Contribute to Janata Weekly</b></h4>
+                            </div>
+                            </td>
+                       
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/sfmrqk">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹500</button>
+                                        </a>
+                                    
+                                </td> 
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/vQZGqM">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹200</button>
+                                        </a>
+                                    
+                                </td>
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/6Xf8af">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹50</button>
+                                        </a>
+                                    
+                                </td>        
+                            </tr>   
+                          
+                    </table>  '''
 
 def renderCoverArticle(data,category):
     coverArticle = '''
@@ -386,40 +466,7 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
                         </tr>
                     </table>
 '''
-contributeAppeal='''<!-- Contribute Janata -->
-                <br>
-                    <table width = "600" style="border:1px solid #ED00D1;" >
-                        <tr>
-                            <td style="padding: 5px;">
-                            <div class="mt-1" >
-                                <h4 style="color: #ED00D1;"><b>Contribute to Janata Weekly</b></h4>
-                            </div>
-                            </td>
-                       
-                                <td style="padding: 5px;">
-                                    
-                                        <a href="https://imjo.in/sfmrqk">
-                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹500</button>
-                                        </a>
-                                    
-                                </td> 
-                                <td style="padding: 5px;">
-                                    
-                                        <a href="https://imjo.in/vQZGqM">
-                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹200</button>
-                                        </a>
-                                    
-                                </td>
-                                <td style="padding: 5px;">
-                                    
-                                        <a href="https://imjo.in/6Xf8af">
-                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹50</button>
-                                        </a>
-                                    
-                                </td>        
-                            </tr>   
-                          
-                    </table>  '''
+
 
 def format_articles(data,length, category, strF,coverFlag):
     for i in range(0,length):
@@ -431,16 +478,18 @@ def format_articles(data,length, category, strF,coverFlag):
                 strF += appealJoinJanatWeekly + contributeAppeal
             coverFlag = True
         else:
-            if (i%2) == 1:
-                strF += '''	<!-- Two columns -->
+            strF += '''	<!-- Two columns -->
                     <table class="section mt-3" cellpadding="0" cellspacing="0">
                         <tr>'''
-
-            strF += renderInternalArticle(data[i])
+            if (i%2) == 1:
+                strF += renderLeftInternalArticle(data[i])
+                strF += ''' </tr>
+                        </table>'''
 
             if (i%2) == 0 or i==(length-1):
+                strF += renderRightInternalArticle(data[i])
                 strF += ''' </tr>
-                    </table>'''
+                        </table>'''
   
     return strF 
 
