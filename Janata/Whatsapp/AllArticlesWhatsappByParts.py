@@ -77,6 +77,13 @@ def whatsapp_Articles_By_Part(summary):
 				if (a == ' '):
 					excerpt[i] = excerpt[i][:-1]
 
+				cEnd = title[i][-1]
+				cStart = title[i][0]
+				if (cEnd == ' ' or (cStart == ' ')):
+					author[i] = author[i][:-1]
+				if (cStart == ' '):
+					author[i] = author[i][1:]
+
 				strF3 += "\n✒️ _"+author[i]+"_\n\n"
 				#strF3 += "📋 _"+excerpt[j-1]+"_\n\n"
 

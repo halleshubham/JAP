@@ -18,14 +18,25 @@ def checkIfAnyElementIsToBeRemoved(tag,title,author):
     return tag
 
 def getMatchingSoupElementWithParaText(para,soupElement):
-    while (para.text != soupElement.text): 
+
+    while (para.text.strip() != soupElement.text.strip()):
         if (soupElement.li != None):
             while (para.text not in soupElement.text):
                 soupElement = soupElement.next_sibling
             return soupElement
+
+        if ('http' in soupElement.text):
+            try:
+                linkText =  soupElement.text.split(' http')[0]
+                if (linkText in para.text):
+                    break
+            except:
+                print ("soup Element doesn't contain http element not in para.text:",para.text)
+
         soupElement = soupElement.next_sibling
+        if(soupElement.tr != None):
+            break
     return soupElement
-        
 
 def convertDocxToHtml (docxFilePath,summaryOfArticle):
     title = summaryOfArticle["article_title"]
@@ -43,6 +54,9 @@ def convertDocxToHtml (docxFilePath,summaryOfArticle):
         article_content = result.value
         with open("file.html", "w", encoding="utf-8") as file:
             file.write(article_content)
+        article_content = article_content.replace('\xad', '')
+        article_content = article_content.replace('\u00ad', '')
+        article_content = article_content.replace('\N{SOFT HYPHEN}', '')
         soup = BeautifulSoup(article_content,'html.parser')
     bullet =''
     count = 0
@@ -77,23 +91,34 @@ def convertDocxToHtml (docxFilePath,summaryOfArticle):
             #if (count == 4):
             #    print("wait")
 
+            #Commenting out code for now
+            if ((cool.tr != None)):
+                print ("Text is a table so checking so ignoring the element \n\n")
+                continue
+
             if ((cool.li != None) and (para.text in cool.text)):
                 print ("Text is a bullet list so checking if ",para.text,"is present in ",cool.text,"\n\n")
+                continue
+
+            if ('http' in cool.text):
+                print ("Text contains http so checking if ",para.text,"is present in ",cool.text,"\n\n")
                 continue
 
             if (cool.img != None):
                 print("Image element found \n",para.text,"\n")
                 count+=1
                 #cool = soup.find_all('p')[count-countofH2]
-                cool = cool.nextSibling
+                if (cool.text == None):
+                    cool = cool.nextSibling
 
-            if (cool.text == para.text):
+            if (cool.text == para.text or (cool.text.strip() == para.text.strip())):
                 print ("Text match with each other\n count will go to ",count,"+1",para.text,"\n\n")
                 count += 1
 
-                if (para.paragraph_format.left_indent != None):
-                    print ("We have indentation for\n",para.text,"\n")
+                if (para.paragraph_format.left_indent != None or (len (para.text) - len(cool.text.strip()) >2)):
+                    #print ("We have indentation for\n",para.text,"\n")
                     cool['style'] = "padding-left: 40px;"
+
                 if para.runs[0].font.size == Pt(14):
                     
                     print ("Initial count of p tags is ",len(soup.find_all('p')),"\n")
