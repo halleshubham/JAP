@@ -389,7 +389,40 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
                         </tr>
                     </table>
 '''
-
+contributeAppeal='''<!-- Contribute Janata -->
+                <br>
+                    <table width = "600" style="border:1px solid #ED00D1;" >
+                        <tr>
+                            <td style="padding: 5px;">
+                            <div class="mt-1" >
+                                <h4 style="color: #ED00D1;"><b>Contribute to Janata Weekly</b></h4>
+                            </div>
+                            </td>
+                       
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/sfmrqk">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹500</button>
+                                        </a>
+                                    
+                                </td> 
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/vQZGqM">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹200</button>
+                                        </a>
+                                    
+                                </td>
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/6Xf8af">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹50</button>
+                                        </a>
+                                    
+                                </td>        
+                            </tr>   
+                          
+                    </table>  '''
 
 def format_articles(data,length, category, strF,coverFlag):
     for i in range(0,length):
@@ -398,7 +431,7 @@ def format_articles(data,length, category, strF,coverFlag):
         if coverFlag == False :
             strF += renderCoverArticle(data[i],category)
             if category == "Print Issue":
-                strF += appealJoinJanatWeekly
+                strF += appealJoinJanatWeekly + contributeAppeal
             coverFlag = True
         else:
             if (i%2) == 1:
