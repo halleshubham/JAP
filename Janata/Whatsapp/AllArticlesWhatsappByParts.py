@@ -69,20 +69,26 @@ def whatsapp_Articles_By_Part(summary):
 
 				strF3 += getSymbols((1+int(i)))+" *"+title[i]+"*\n"
 
-				b= author[i][-1]
-				if (b == ' '):
+				authorStart= author[i][0]
+				authorEnd= author[i][-1]
+				if (authorEnd == ' '):
 					author[i] = author[i][:-1]
-
-				a= excerpt[i][-1]
-				if (a == ' '):
-					excerpt[i] = excerpt[i][:-1]
-
-				cEnd = title[i][-1]
-				cStart = title[i][0]
-				if (cEnd == ' ' or (cStart == ' ')):
-					author[i] = author[i][:-1]
-				if (cStart == ' '):
+				if (authorStart == ' '):
 					author[i] = author[i][1:]
+				
+				excerptStart= excerpt[i][0]
+				excerptEnd= excerpt[i][-1]
+				if (excerptEnd == ' '):
+					excerpt[i] = excerpt[i][:-1]
+				if (excerptStart == ' '):
+					excerpt[i] = excerpt[i][1:]
+
+				titleEnd = title[i][-1]
+				titleStart = title[i][0]
+				if (titleEnd == ' '):
+					title[i] = title[i][:-1]
+				if (titleStart == ' '):
+					title[i] = title[i][1:]
 
 				strF3 += "\n✒️ _"+author[i]+"_\n\n"
 				#strF3 += "📋 _"+excerpt[j-1]+"_\n\n"
