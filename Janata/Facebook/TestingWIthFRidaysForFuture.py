@@ -54,7 +54,9 @@ def getDifferentPhotoURL(id):
 		photoURL["medium_large"] = data["media_details"]["sizes"]["medium"]["medium_large"]
 	except:
 		print("Medium Large size doesn't exist")
-
+	
+	if (photoURL == {}):
+		print ("There is issue with getting Image")
 	return photoURL
 
 def removeUnwantedtext(id):
@@ -128,7 +130,7 @@ def publishArticle(mess,ti,url,murl,pageID,accesst):
 		time.sleep(20)
 		publishArticle(mess,ti,url,murl,accesst,pageID)
 		"""
-	return a 
+	return a
 
 def publishPhotoArticle(mess,ti,murl,accesst,pageID):
 	graph = facebook.GraphAPI(access_token=accesst)
@@ -238,6 +240,9 @@ def publishingAllArticles(dates,pageID,access_token,summary,postsTobeDeleted):
 			link = data[i]["link"]
 			photoId  = data[i]["featured_media"]
 			murl = getDifferentPhotoURL(photoId)
+			if (murl == {}):
+				murl["actual_size"]= data[i]['jetpack_featured_media_url']
+				print ("There is issue with getting Image")
 			print (strF1,"\n")
 			currentID = publishArticle(strF1,eachPostTime[i],link,murl["actual_size"],pageID,access_token)
 			attachMent = getArticleAttachment(currentID["id"],access_token)

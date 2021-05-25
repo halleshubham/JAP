@@ -77,7 +77,7 @@ def getImages(summary):
     driver.get('https://www.google.com/imghp')
 
     # get the image source
-
+    
     searchTextbox = driver.find_element_by_xpath('//*[@id="sbtc"]/div/div[2]/input')
     #//input[@title="Search"]
     searchTextbox.send_keys(summary[0]["titles"][2])
@@ -90,16 +90,30 @@ def getImages(summary):
     count = 1
     imagepaths = []
     for i in range(0,len(summary[0]["titles"])):
+        searchAuthor = summary[0]["authors"][i]
+        if (';' in searchAuthor):
+            searchAuthor = searchAuthor.split(';',1)
+            searchAuthor = searchAuthor[0]
+        if (',' in searchAuthor):
+            searchAuthor = searchAuthor.split(',',1)
+            searchAuthor = searchAuthor[0]
+
+        searchTitle = summary[0]["titles"][i]
+        if ('Two' in searchTitle):
+            searchTitle = searchTitle.split('Two',1)
+            searchTitle = searchTitle[0]
+
         textBox = driver.find_element_by_xpath('//input[@title="Search"]')
-        searchText = summary[0]["titles"][i] + " " + summary[0]["authors"][i]
+        searchText = searchTitle + " " + searchAuthor
         textBox.send_keys(searchText)
         searchButton = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'/html/body/c-wiz/div/header/div[2]/div/div[1]/form/div[1]/div[2]/button')))
         searchButton.click()
 
         try:
-            img = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[2]/c-wiz/div[3]/div[1]/div/div/div/div/div[1]/div[1]/div[1]/a[1]/div[1]/img')))
+            img = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[2]/c-wiz/div[3]/div[1]/div/div/div/div[1]/div[1]/span/div[1]/div[1]/div[1]/a[1]/div[1]/img')))
             img.click()
         except Exception as e:
+
             textBox = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,'//input[@title="Search"]')))
             textBox.clear()
             count += 1
@@ -108,7 +122,7 @@ def getImages(summary):
         time.sleep(10)
 
         try: 
-            imageBiggerSize = WebDriverWait(driver,20).until(EC.presence_of_element_located((By.XPATH,'//*[@id="Sva75c"]/div/div/div[3]/div[2]/c-wiz/div/div[1]/div[1]/div/div[2]/a/img')))
+            imageBiggerSize = WebDriverWait(driver,20).until(EC.presence_of_element_located((By.XPATH,'/html/body/div[2]/c-wiz/div[3]/div[2]/div[3]/div/div/div[3]/div[2]/c-wiz/div/div[1]/div[1]/div/div[2]/a/img')))
         except Exception as e:
             print (e)
             img = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'/html/body/div[2]/c-wiz/div[3]/div[1]/div/div/div/div/div[1]/div[1]/div[1]/a[1]/div[1]/img')))
