@@ -2,7 +2,7 @@ from JAP_Authentication.authenticate import get_creds
 import json
 from pprint import pprint
 import os
-from jap import upload_images,get_summary_data,get_authors_list,add_authors,create_post,delete_images
+from utility_functions.jap import upload_images,get_summary_data,get_authors_list,add_authors,create_post,delete_images
 from datetime import datetime
 import mammoth
 import os,docx

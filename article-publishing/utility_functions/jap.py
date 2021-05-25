@@ -1,5 +1,5 @@
 from JAP_Authentication.authenticate import get_creds
-from DocParser.parse_doc import get_summary_data
+from doc_parser.parse_doc import get_summary_data
 from requests_oauthlib import OAuth1Session
 from requests_oauthlib import OAuth1
 import json
