@@ -5,8 +5,9 @@
 *.doc
 *.zip
 *.jpeg
-*.json
 *.log
 *.pyproj
+jap_config.json
+For FB.json
 _pycache_/*
 article-publishing/env/*
