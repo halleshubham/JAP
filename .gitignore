@@ -1,4 +1,3 @@
-
 *.txt
 *.html
 *.jpg
@@ -7,3 +6,7 @@
 *.zip
 *.jpeg
 *.json
+*.log
+*.pyproj
+_pycache_/*
+article-publishing/env/*
