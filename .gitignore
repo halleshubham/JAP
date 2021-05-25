@@ -1,7 +1,13 @@
-JAP_Authentication/jap_config.json
+*.txt
+*.html
+*.jpg
 *.docx
-*__pycache__/
-jap/
-.vscode/
-author_test.py
-issue_params.json
+*.doc
+*.zip
+*.jpeg
+*.log
+*.pyproj
+jap_config.json
+For FB.json
+__pycache__
+article-publishing/env/*

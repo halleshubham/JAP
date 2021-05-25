@@ -3,8 +3,32 @@ import json
 import datetime
 import re
 
+
+creds_path="For FB.json"
+with open(creds_path, encoding='utf-8-sig')  as f:
+        creds=json.load(f)
+issue_date = '2021-04-04'
+
+conn = http.client.HTTPSConnection("janataweekly.org")
+   
+headers = {
+	'content-type': "application/json",
+	'cache-control': "no-cache"
+	}
+
+#Print Issue Data
+conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=669&after="+ issue_date +"T00:00:00")
+res = conn.getresponse()
+print_data = json.loads(res.read())
+
+#Blog Issue Data
+conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=521&after="+ issue_date +"T00:00:00")
+res1 = conn.getresponse()
+blog_data = json.loads(res1.read())
+
+
 def getAuthorName(id):
-	conn = http.client.HTTPConnection("janataweekly.org")
+	conn = http.client.HTTPSConnection("janataweekly.org")
 
 	headers = {
 		'content-type': "application/json",
@@ -56,18 +80,10 @@ def renderInternalArticle(data):
                             </td>'''
 	return internalArticle
 
-conn = http.client.HTTPConnection("janataweekly.org")
 
-headers = {
-	'content-type': "application/json",
-	'cache-control': "no-cache"
-	}
 
-conn.request("GET", "/wp-json/wp/v2/posts?per_page=40")
-res = conn.getresponse()
-data = json.loads(res.read())
 
-refDateObj = datetime.datetime.strptime(data[0]["date"],'%Y-%m-%dT%H:%M:%S')
+refDateObj = datetime.datetime.strptime(print_data[0]["date"],'%Y-%m-%dT%H:%M:%S')
 
 strF = '''
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -77,7 +93,7 @@ strF = '''
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-        Janata Weekly, India's oldest socialist weekly!
+        Janata Weekly, India's oldest Socialist Weekly!
     </title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
         crossorigin="anonymous">
@@ -168,10 +184,10 @@ aboutJanata = '''<!-- Header image -->
                                                             <b>Janata Weekly</b>
                                                         </div>
                                                     </h1>
-                                                    <h3>India's oldest socialist magazine!</h3>
+                                                    <h3>India's oldest Socialist Weekly!</h3>
                                                     <p>
-                                                        <b>Vol.75, No. '''+ str(datetime.date.today().isocalendar()[1] - 4) +''' | '''+refDateObj.strftime('%d %B, %Y')+''' Issue</b>
-                                                        <br/> <font style="color:red;">Editor: </font><b>Dr.G.G. Parikh</b>|<font style="color:red;">Associate Editor: </font><b>Neeraj Jain</b>|<font style="color:red;">Managing Editor: </font><b>Guddi</b>
+                                                        <b>Vol. 75, No. '''+ str(datetime.date.today().isocalendar()[1] - 4) +''' | '''+refDateObj.strftime('%d %B %Y')+''' Issue</b>
+                                                        <br/> <font style="color:red;">Editor: </font><b>Dr. G.G. Parikh</b> | <font style="color:red;">Associate Editor: </font><b>Neeraj Jain</b> | <font style="color:red;">Managing Editor: </font><b>Guddi</b>
                                                     </p>
                                                     <hr>
                                                 </div>
@@ -183,10 +199,17 @@ aboutJanata = '''<!-- Header image -->
                         </tr>
                     </table>'''
 
-def renderCoverArticle(data):
-	coverArticle = '''
+def renderCoverArticle(data,category):
+    coverArticle = '''
 	<!--COVER ARTICLE-->
                     <table class="section header" cellpadding="0" cellspacing="0" width="600">
+                      <tr>
+                            <td class="column"  align="center">
+                                <br>
+                                <h3 style="box-sizing:border-box;margin:0px;font-weight:500;line-height:1.6;font-size:1.75rem;background:yellow">'''+ category +'''</h3>
+                                <br>
+                            </td>   
+                        </tr>
                         <tr>
                             <td class="column">
                                 <table>
@@ -230,7 +253,7 @@ def renderCoverArticle(data):
                             </td>
                         </tr>
                     </table>'''
-	return coverArticle
+    return coverArticle
 
 footerJanata = '''
   <!--FOOTER-->
@@ -286,7 +309,7 @@ footerJanata = '''
                                                     <div class="col">
                                                         <div class="hero-unit">
                                                             <div id="mail-image">
-                                                                <a href="http://tiny.cc/JoinJanataWeekly">
+                                                                <a href="https://janataweekly.org/subscribe">
                                                                     <img class="img-fluid img-responsive" style="max-width:8%" src="https://toppng.com/uploads/preview/icon-mail-png-transparent-background-mail-logo-11562851894ksatrtd2da.png"
                                                                     />
                                                                 </a>
@@ -294,7 +317,7 @@ footerJanata = '''
                                                             <h5>Subscribe to Janata Weekly Hard Copy
                                                                 <br/> Annual Rs. 260 | Three Years : Rs. 750
                                                                 <br/> Contact: Guddi +91 7738082170
-                                                                <a href="http://tiny.cc/JoinJanataWeekly"> <br/> <b> Click here to <font style="{color:red;}">Receive Janata Weekly on WhatsApp & Email!</font> </a></h5>
+                                                                <a href="https://janataweekly.org/subscribe"> <br/> <b> Click here to <font style="{color:red;}">Receive Janata Weekly on WhatsApp & Email!</font> </a></h5>
                                                             <hr>
                                                             <h5>
                                                                 <a href="http://janataweekly.org" style="color:#ED00D1;"><font style="{color:red;}">Website: </font>JanataWeekly.org</a>
@@ -322,9 +345,9 @@ endOfHTML = '''
 </html>'''
 
 strF += aboutJanata
-# strF += coverArticle
+
 appealJoinJanatWeekly = '''<!-- Join Janata -->
-                    <table class="section header" cellpadding="0" cellspacing="0" width="600">
+                    <table class="section header mt-1" cellpadding="0" cellspacing="0" width="600" style="background: yellow;">
                         <tr>
                             <td class="column">
                                 <table>
@@ -336,7 +359,7 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
                                                         <div class="col-sm-4">
                                                             <div class="hero-unit text-center">
                                                                 <div id="cover-image">
-                                                                    <a href="http://tiny.cc/JoinJanataWeekly">
+                                                                    <a href="https://janataweekly.org/subscribe">
                                                                         <img class="img-fluid float-right" src="https://www.itl.cat/pngfile/big/9-91359_data-at-your-fingertips.jpg" />
                                                                     </a>
                                                                 </div>
@@ -347,11 +370,11 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
                                                                 <h4>Janata at your fingertips!</h4>
                                                             </div>
                                                             <div class="mt-1">
-                                                                <p>Fill below form and start recieving Janata Weekly directly
+                                                                <p>Fill below form and start receiving Janata Weekly directly
                                                                     to your E-mail and WhatsApp for free!</p>
                                                             </div>
                                                             <div>
-                                                                <a href="http://tiny.cc/JoinJanataWeekly">
+                                                                <a href="https://janataweekly.org/subscribe">
                                                                     <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">Fill Form Now!</button>
                                                                 </a>
                                                             </div>
@@ -366,27 +389,72 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
                         </tr>
                     </table>
 '''
+contributeAppeal='''<!-- Contribute Janata -->
+                <br>
+                    <table width = "600" style="border:1px solid #ED00D1;" >
+                        <tr>
+                            <td style="padding: 5px;">
+                            <div class="mt-1" >
+                                <h4 style="color: #ED00D1;"><b>Contribute to Janata Weekly</b></h4>
+                            </div>
+                            </td>
+                       
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/sfmrqk">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹500</button>
+                                        </a>
+                                    
+                                </td> 
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/vQZGqM">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹200</button>
+                                        </a>
+                                    
+                                </td>
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/6Xf8af">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹50</button>
+                                        </a>
+                                    
+                                </td>        
+                            </tr>   
+                          
+                    </table>  '''
 
-coverFlag = False
-
-for i in range(30,-1,-1):
-	print(data[i]["author"])
-	if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
-		if coverFlag == False :
-			strF += renderCoverArticle(data[i])
-			strF += appealJoinJanatWeekly
-			coverFlag = True
-		else:
-			if (i%2) == 1:
-				strF += '''	<!-- Two columns -->
+def format_articles(data,length, category, strF,coverFlag):
+    for i in range(0,length):
+        #print(print_data[i]["author"])
+        #if (refDateObj.date() - datetime.datetime.strptime(print_data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
+        if coverFlag == False :
+            strF += renderCoverArticle(data[i],category)
+            if category == "Print Issue":
+                strF += appealJoinJanatWeekly + contributeAppeal
+            coverFlag = True
+        else:
+            if (i%2) == 1:
+                strF += '''	<!-- Two columns -->
                     <table class="section mt-3" cellpadding="0" cellspacing="0">
                         <tr>'''
 
-			strF += renderInternalArticle(data[i])
+            strF += renderInternalArticle(data[i])
 
-			if (i%2) == 0 or i==0:
-				strF += ''' </tr>
+            if (i%2) == 0 or i==(length-1):
+                strF += ''' </tr>
                     </table>'''
+  
+    return strF 
+
+
+print_length = len(print_data)
+blog_length = len(blog_data)
+coverFlag = False
+strF = format_articles(print_data, print_length, "Print Issue", strF, coverFlag)
+coverFlag = False
+
+strF = format_articles(blog_data, blog_length, "Blog", strF, coverFlag)
 
 strF += footerJanata
 strF += endOfHTML
