@@ -9,5 +9,5 @@
 *.pyproj
 jap_config.json
 For FB.json
-_pycache_/*
+__pycache__
 article-publishing/env/*
