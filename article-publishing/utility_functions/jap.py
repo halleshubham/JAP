@@ -90,7 +90,7 @@ def create_author(author,creds):
         return r.json()['id']
     else:
         error = r.json()
-        if error['code'] == 'existing_user_email':
+        if error['code'] == 'existing_user_email' or error['code'] == 'existing_user_login':
             existing_author_id = get_author_by_email(author,creds)
             if existing_author_id:
                 update_status = update_author(author,existing_author_id,creds)

@@ -145,7 +145,7 @@ creds=get_creds()
 if creds:
 
     # getting the parameters from issue_params.json
-    with open('issue_params.json') as params_file:
+    with open('article-publishing/issue_params.json') as params_file:
         params = json.load(params_file)
 
     # getting Summary data

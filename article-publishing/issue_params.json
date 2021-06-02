@@ -1,13 +1,13 @@
 {
-  "summaryfile": "C:\\Users\\shubham.halle\\WorkSpace\\JAP\\workspace\\Summary.docx",
+  "summaryfile": "C:/Users/akshay.raut/Downloads/Summary.docx",
 
-  "articles_folder_path": "C:/Users/shubham.halle/WorkSpace/JAP/workspace/articlesforjanata23may2021issue/",
+  "articles_folder_path": "C:/Users/akshay.raut/Downloads/fwdjanata30may2021articles/",
 
-  "images_folder_path": "C:/Users/shubham.halle/WorkSpace/JAP/workspace/Images/",
+  "images_folder_path": "C:/Users/akshay.raut/Downloads/fwdjanata30may2021articles/",
 
-  "publish_date": "2021-5-23",
+  "publish_date": "2021-6-21",
 
   "print_edition_articles": [0, 0],
 
-  "blog_edition_articles": [1, 3]
+  "blog_edition_articles": [1, 1]
 }
