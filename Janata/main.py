@@ -1,6 +1,6 @@
 ﻿from GeneralSummaryWithCreds import get_summary_data
 from Whatsapp.AllArticlesWhatsappByParts import whatsapp_Articles_By_Part
-from Whatsapp.EnglishWhatsappMessagesUsingDOcx import LokayatEnglishWhatsapp
+from Whatsapp.EnglishWhatsappMessages import AbhivyaktiAndLokayatEnglishWhatsAppMessages
 
 from Facebook.TestingWIthFRidaysForFuture import publishingAllArticles
 from Facebook.FacebookTextDocx import get_Facebook_Txt_For_Kedar
@@ -22,4 +22,4 @@ summary = get_summary_data(creds["File_path"])
 #getting_Facebook_Txt_For_Kedar = get_Facebook_Txt_For_Kedar(summary)
 
 getting_All_Articles_For_Janata_Whatsapp_By_Parts=whatsapp_Articles_By_Part(summary)
-getting_Lokayat_English_Messages = LokayatEnglishWhatsapp(summary)
+AbhivyaktiAndLokayatEnglishWhatsAppMessages(28)
