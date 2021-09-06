@@ -37,9 +37,13 @@ def removeUnwantedtext(id):
 	id = id.replace("&#8217","'")
 	return id
 
-def AbhivyaktiAndLokayatEnglishWhatsAppMessages(numberOfArticles):
-	conn = http.client.HTTPSConnection("janataweekly.org")
+def AbhivyaktiAndLokayatEnglishWhatsAppMessages(summary):
 
+	author= summary[0]['authors']
+	excerpt=summary[0]['excerpts']
+	title=summary[0]['titles']
+
+	conn = http.client.HTTPSConnection("janataweekly.org")
 	headers = {
 		'content-type': "application/json",
 		'cache-control': "no-cache"
@@ -68,50 +72,57 @@ def AbhivyaktiAndLokayatEnglishWhatsAppMessages(numberOfArticles):
 	strF1=""
 	strAbhivyakti =""
 
-	while j<numberOfArticles:
+	while j<len(author):
 		if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
 
-			title = data[i]["title"]["rendered"]
-			titleEnd =  [-1]
-			titleStart = title[0]
-			if (titleEnd == ' '):
-				title = title[:-1]
-			if (titleStart == ' '):
-				title = title[1:]
+			title[i] = unicodedata.normalize("NFKD",title[i])
+			author[i] = unicodedata.normalize("NFKD",author[i])
+			excerpt[i] = unicodedata.normalize("NFKD",excerpt[i])
 
-			strF1 += "⭕ *"+title+"*\n\n"
-			strAbhivyakti += "⭕ *"+title+"*\n\n"
+			if (author[i].__contains__('\t')):
+				author[i] = author[i].replace("\t", "", -1)
 
-			authorName = getAuthorName(data[i]["author"]) 
-			excerpt = data[i]["excerpt"]["rendered"]
+			if (title[i].__contains__('\t')):
+				title[i] = title[i].replace("\t", "", -1)
 
-			excerpt2 = unicodedata.normalize("NFKD",excerpt)
+			if (excerpt[i].__contains__('\t')):
+				excerpt[i] = excerpt[i].replace("\t", "", -1)
 
-			excerpt = excerpt.rstrip("\n")
-			excerpt = excerpt.replace("<p>", "")
-			excerpt = excerpt.replace("</p>", "")
-			excerpt = removeUnwantedtext(excerpt)
+			authorStart= author[i][0]
+			while (authorStart == ' '):
+				author[i] = author[i][1:]
+				authorStart= author[i][0]
 
-			authorStart= authorName[0]
-			authorEnd= authorName[-1]
-			if (authorEnd == ' '):
-				authorName = authorName[:-1]
-			if (authorStart == ' '):
-				authorName = authorName[1:]
+			authorEnd= author[i][-1]
+			while (authorEnd == ' '):
+				author[i] = author[i][:-1]
+				authorEnd= author[i][-1]
 				
-			excerptStart= excerpt[0]
-			excerptEnd= excerpt[-1]
-			if (excerptEnd == ' '):
-				excerpt = excerpt[:-1]
-			if (excerptStart == ' '):
-				excerpt = excerpt[1:]
+			excerptStart= excerpt[i][0]
+			while (excerptStart == ' '):
+				excerpt[i] = excerpt[i][1:]
+				excerptStart= excerpt[i][0]
 
-			a= excerpt[-1]
-			if (a == ' '):
-				excerpt = excerpt.replace(" ", "")
+			excerptEnd= excerpt[i][-1]
+			while (excerptEnd == ' '):
+				excerpt[i] = excerpt[i][:-1]
+				excerptEnd= excerpt[i][-1]
+				
+			titleStart = title[i][0]
+			while (titleStart == ' '):
+				title[i] = title[i][1:]
+				titleStart = title[i][0]
 
-			strF1 += "✒️ "+authorName+"\n\n_"+excerpt+"_\n\n*Read full article:*\n"
-			strAbhivyakti += "✒️ "+authorName+"\n\n_"+excerpt+"_\n\n*Read full article:*\n"
+			titleEnd = title[i][-1]
+			while (titleEnd == ' '):
+				title[i] = title[i][:-1]
+				titleEnd = title[i][-1]
+			
+			strF1 += "⭕ *"+title[i]+"*\n\n"
+			strAbhivyakti += "⭕ *"+title[i]+"*\n\n"
+
+			strF1 += "✒️ "+author[i]+"\n\n_"+excerpt[i]+"_\n\n*Read full article:*\n"
+			strAbhivyakti += "✒️ "+author[i]+"\n\n_"+excerpt[i]+"_\n\n*Read full article:*\n"
 
 			strAbhivyakti += data[i]["link"]+"\n\n"+abhivyaktiFooter
 			strF1 += data[i]["link"]+"\n\n"+lokayatFooter
@@ -127,5 +138,3 @@ def AbhivyaktiAndLokayatEnglishWhatsAppMessages(numberOfArticles):
 	f4 = open("EnglishWhatsappMessagesWithAbhivyaktiFooter.txt","w",encoding="UTF-8")
 	f4.write(strAbhivyakti)
 	f4.close()
-
-AbhivyaktiAndLokayatEnglishWhatsAppMessages(28)

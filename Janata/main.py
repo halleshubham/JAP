@@ -7,7 +7,7 @@ from Facebook.FacebookTextDocx import get_Facebook_Txt_For_Kedar
 
 import json
 
- #108144264067982
+         #108144264067982
  #319140888763658
 
 #f=open('jap_conf.json',"r")
@@ -22,4 +22,4 @@ summary = get_summary_data(creds["File_path"])
 #getting_Facebook_Txt_For_Kedar = get_Facebook_Txt_For_Kedar(summary)
 
 getting_All_Articles_For_Janata_Whatsapp_By_Parts=whatsapp_Articles_By_Part(summary)
-AbhivyaktiAndLokayatEnglishWhatsAppMessages(28)
+AbhivyaktiAndLokayatEnglishWhatsAppMessages(summary)

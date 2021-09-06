@@ -1,11 +1,12 @@
 from selenium import webdriver 
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC 
 from selenium.webdriver.common.keys import Keys 
 from selenium.webdriver.common.by import By 
 import time 
 import docx
-from TextFilefortweets import getting_Tweets
+#from TextFilefortweets import getting_Tweets
 
 def checkIfMessageInBoxIsComplete(driver,text):
     try:
@@ -48,7 +49,7 @@ def checkIfMessageInBoxIsComplete(driver,text):
         EC.text_to_be_present_in_element
         '''
     
-driver = webdriver.Chrome('C:/Users/uday.deshmukh/Downloads/chromedriver_win32/chromedriver') 
+driver = webdriver.Chrome(ChromeDriverManager().install()) 
 driver.get('https://web.whatsapp.com/')
 
 #name = input('Enter the name of user or group : ')
@@ -58,7 +59,7 @@ driver.get('https://web.whatsapp.com/')
 user = WebDriverWait(driver,100).until(EC.element_to_be_clickable((By.XPATH,'//*[@title="Whatsapp Script Testing"]')))
 user.click()
 
-tweets = getting_Tweets()
+#tweets = getting_Tweets()
 slots = int(len(tweets)/20)
 
 if ((len(tweets)%20) != 0):

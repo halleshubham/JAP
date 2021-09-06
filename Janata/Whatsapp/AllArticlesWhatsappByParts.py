@@ -68,28 +68,51 @@ def whatsapp_Articles_By_Part(summary):
 			if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
 
 				strF3 += getSymbols((1+int(i)))+" *"+title[i]+"*\n"
+				title[i] = unicodedata.normalize("NFKD",title[i])
+				author[i] = unicodedata.normalize("NFKD",author[i])
+				excerpt[i] = unicodedata.normalize("NFKD",excerpt[i])
 
-				authorStart= author[i][0]
-				authorEnd= author[i][-1]
-				if (authorEnd == ' '):
-					author[i] = author[i][:-1]
-				if (authorStart == ' '):
+				#Remove '/t' from author, excerpt and title
+
+				if (author[i].__contains__('\t')):
+					author[i] = author[i].replace("\t", "", -1)
+
+				if (title[i].__contains__('\t')):
+					title[i] = title[i].replace("\t", "", -1)
+
+				if (excerpt[i].__contains__('\t')):
+					excerpt[i] = excerpt[i].replace("\t", "", -1)
+
+				authorStart = author[i][0]
+				while (authorStart == ' '):
 					author[i] = author[i][1:]
+					authorStart= author[i][0]
+
+				authorEnd= author[i][-1]
+				while (authorEnd == ' '):
+					author[i] = author[i][:-1]
+					authorEnd= author[i][-1]
 				
 				excerptStart= excerpt[i][0]
-				excerptEnd= excerpt[i][-1]
-				if (excerptEnd == ' '):
-					excerpt[i] = excerpt[i][:-1]
-				if (excerptStart == ' '):
+				while (excerptStart == ' '):
 					excerpt[i] = excerpt[i][1:]
+					excerptStart= excerpt[i][0]
+
+				excerptEnd= excerpt[i][-1]
+				while (excerptEnd == ' '):
+					excerpt[i] = excerpt[i][:-1]
+					excerptEnd= excerpt[i][-1]
+				
+				titleStart = title[i][0]
+				while (titleStart == ' '):
+					title[i] = title[i][1:]
+					titleStart = title[i][0]
 
 				titleEnd = title[i][-1]
-				titleStart = title[i][0]
-				if (titleEnd == ' '):
+				while (titleEnd == ' '):
 					title[i] = title[i][:-1]
-				if (titleStart == ' '):
-					title[i] = title[i][1:]
-
+					titleEnd = title[i][-1]
+					 
 				strF3 += "\n✒️ _"+author[i]+"_\n\n"
 				#strF3 += "📋 _"+excerpt[j-1]+"_\n\n"
 
