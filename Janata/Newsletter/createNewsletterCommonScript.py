@@ -7,7 +7,7 @@ import re
 creds_path="For FB.json"
 with open(creds_path, encoding='utf-8-sig')  as f:
         creds=json.load(f)
-issue_date = '2021-04-04'
+issue_date = '2021-09-05'
 
 conn = http.client.HTTPSConnection("janataweekly.org")
    
@@ -25,7 +25,6 @@ print_data = json.loads(res.read())
 conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=521&after="+ issue_date +"T00:00:00")
 res1 = conn.getresponse()
 blog_data = json.loads(res1.read())
-
 
 def getAuthorName(id):
 	conn = http.client.HTTPSConnection("janataweekly.org")
@@ -83,7 +82,7 @@ def renderInternalArticle(data):
 
 
 
-refDateObj = datetime.datetime.strptime(print_data[0]["date"],'%Y-%m-%dT%H:%M:%S')
+refDateObj = datetime.datetime.strptime(blog_data[0]["date"],'%Y-%m-%dT%H:%M:%S')
 
 strF = '''
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -360,7 +359,7 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
                                                             <div class="hero-unit text-center">
                                                                 <div id="cover-image">
                                                                     <a href="https://janataweekly.org/subscribe">
-                                                                        <img class="img-fluid float-right" src="https://www.itl.cat/pngfile/big/9-91359_data-at-your-fingertips.jpg" />
+                                                                        <img class="img-fluid float-right" src="http://branchaweb.com/wats1010-product-page/Single_Tap.png" />
                                                                     </a>
                                                                 </div>
                                                             </div>
@@ -431,6 +430,8 @@ def format_articles(data,length, category, strF,coverFlag):
         if coverFlag == False :
             strF += renderCoverArticle(data[i],category)
             if category == "Print Issue":
+                strF += appealJoinJanatWeekly + contributeAppeal
+            elif category == "Blog":
                 strF += appealJoinJanatWeekly + contributeAppeal
             coverFlag = True
         else:
