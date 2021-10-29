@@ -21,12 +21,6 @@ def whatsapp_Articles_By_Part(summary):
 	excerpt=summary[0]['excerpts']
 	title=summary[0]['titles']
 	conn = http.client.HTTPSConnection("janataweekly.org")
-
-	headers = {
-		'content-type': "application/json",
-		'cache-control': "no-cache"
-		}
-
 	conn.request("GET", "/wp-json/wp/v2/posts?per_page=36")
 	res = conn.getresponse()
 	data = json.loads(res.read())
@@ -67,7 +61,7 @@ def whatsapp_Articles_By_Part(summary):
 		for i in range(lowerLimit,upperLimit,1):
 			if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
 
-				strF3 += getSymbols((1+int(i)))+" *"+title[i]+"*\n"
+				strF3 += getSymbols((1+int(i)))+" *"
 				title[i] = unicodedata.normalize("NFKD",title[i])
 				author[i] = unicodedata.normalize("NFKD",author[i])
 				excerpt[i] = unicodedata.normalize("NFKD",excerpt[i])
@@ -113,7 +107,7 @@ def whatsapp_Articles_By_Part(summary):
 					title[i] = title[i][:-1]
 					titleEnd = title[i][-1]
 					 
-				strF3 += "\n✒️ _"+author[i]+"_\n\n"
+				strF3 += title[i]+"*\n\n✒️ _"+author[i]+"_\n\n"
 				#strF3 += "📋 _"+excerpt[j-1]+"_\n\n"
 
 				if (i != (upperLimit-1)):

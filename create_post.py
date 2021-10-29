@@ -137,6 +137,7 @@ def convertDocxToHtml (docxFilePath,summaryOfArticle):
 
     for imageElement in soup.find_all('img'):
         imageElement['class'] = "aligncenter"
+        print ("There is image in article named\n", summaryOfArticle["article_title"])
     return str(soup)
 
 

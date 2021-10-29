@@ -64,8 +64,8 @@ def AbhivyaktiAndLokayatEnglishWhatsAppMessages(summary):
 	lokayatFooter += "📱 _लोकायतचे मराठी/हिंदी व्हाट्सएप चॅनेलला जॉईन करा:_\nhttps://chat.whatsapp.com/Gr322B7eE5f7dUCQfcbv5O\n\n"
 	lokayatFooter += "📱 _Like Janata Weekly Facebook page:_\nhttps://www.faceboook.com/janataweekly\n\n"
 
-	abhivyaktiFooter = "-----------------------------------------------------------\n 📱 _Join Abhivyakti's English Whatsapp Channel:_\nhttps://chat.whatsapp.com/IYdOYT4MuCtDNhkgHoVKn0\n\n"
-	abhivyaktiFooter += "📱 _अभिव्यक्तीचे मराठी/हिंदी व्हाट्सएप चॅनेलला जॉईन करा:_\nhttps://chat.whatsapp.com/Dvrwcdpw0TdDYMsRciyufS\n\n"
+	abhivyaktiFooter = "-----------------------------------------------------------\n 📱 _Join Abhivyakti's English Whatsapp Channel:_\nhttps://chat.whatsapp.com/DXy57v3gBLrGw1iH5eGxZl\n\n"
+	abhivyaktiFooter += "📱 _अभिव्यक्तीचे मराठी/हिंदी व्हाट्सएप चॅनेलला जॉईन करा:_\nhttps://chat.whatsapp.com/KMjJldi53sIL6ZXVVNGvRT\n\n"
 	abhivyaktiFooter += "📱 _Like Janata Weekly Facebook page:_\nhttps://www.faceboook.com/janataweekly\n\n"
 	j=0
 	i=l

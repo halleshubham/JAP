@@ -4,9 +4,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver 
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support import expected_conditions as EC 
-from selenium.webdriver.common.keys import Keys 
-from selenium.webdriver.common.by import By 
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
 from GeneralSummaryWithCreds import get_summary_data
 import urllib
 import json
@@ -73,9 +73,9 @@ def getAnotherImage(title,driver):
 def getImages(summary):
     driver = webdriver.Chrome(ChromeDriverManager().install()) 
     #driver = webdriver.Firefox(executable_path='E:\Lok\geckodriver.exe') 
-    #webdriver.Firefox
+    #webdriver.Firefox 
     driver.get('https://www.google.com/imghp')
-
+    driver.fullscreen_window()
     # get the image source
     
     searchTextbox = driver.find_element_by_xpath('//*[@id="sbtc"]/div/div[2]/input')
@@ -142,7 +142,7 @@ def getImages(summary):
        
         try:
             resource =urllib.request.urlopen(url, timeout=20)
-            output = open(str(count)+".jpg","wb")
+            output = open("C:\\Users\\uday.deshmukh\\Documents\\Janata Images\\" +str(count)+".jpg","wb")
             output.write(resource.read())
             output.close()
         except Exception as e:
@@ -152,7 +152,8 @@ def getImages(summary):
             #    image_file = wget.download(url)
             #except Exception as e:
             #    print (e)
-            filename = str(count)+".jpeg"
+
+            filename = "C:\\Users\\uday.deshmukh\\Documents\\Janata Images\\" + str(count)+".jpeg"
             try:
 
             # Open the url image, set stream to True, this will return the stream content.

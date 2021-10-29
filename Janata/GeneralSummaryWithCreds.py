@@ -10,7 +10,7 @@ def get_summary_data(filepath):
     title=[]
     for para in doc.paragraphs[1:]:
         
-        if (para.text != '') and (para.text != ' '):
+        if (para.text != '') and (para.text != ' ') and (para.text != 'Print') and (para.text != ('Blog')):
             if (len(author)== len(excerpt)==len(title)): 
                 title1=para.text
                 title1=title1.split('. ',1)

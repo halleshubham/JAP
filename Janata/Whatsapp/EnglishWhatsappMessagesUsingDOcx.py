@@ -37,6 +37,10 @@ def LokayatEnglishWhatsapp(summary):
 	while j<l:
 		if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
 
+			title[j] = unicodedata.normalize("NFKD",title[j])
+			author[j] = unicodedata.normalize("NFKD",author[j])
+			excerpt[j] = unicodedata.normalize("NFKD",excerpt[j])
+
 			strF1 += "⭕ *"+title[j]+"*\n\n"
 			strF1 += "✒️ "+author[j]+"\n\n_"+excerpt[j]+"_\n\n*Read full article:*\n"
 			strF1 += data[i]["link"]+"\n\n"+imp
