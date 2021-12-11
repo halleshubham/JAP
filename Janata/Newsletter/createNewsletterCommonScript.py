@@ -7,7 +7,7 @@ import re
 creds_path="For FB.json"
 with open(creds_path, encoding='utf-8-sig')  as f:
         creds=json.load(f)
-issue_date = '2021-09-05'
+issue_date = '2021-12-05'
 
 conn = http.client.HTTPSConnection("janataweekly.org")
    
@@ -78,8 +78,6 @@ def renderInternalArticle(data):
                                 </table>
                             </td>'''
 	return internalArticle
-
-
 
 
 refDateObj = datetime.datetime.strptime(blog_data[0]["date"],'%Y-%m-%dT%H:%M:%S')
@@ -188,6 +186,10 @@ aboutJanata = '''<!-- Header image -->
                                                         <b>Vol. 75, No. '''+ str(datetime.date.today().isocalendar()[1] - 4) +''' | '''+refDateObj.strftime('%d %B %Y')+''' Issue</b>
                                                         <br/> <font style="color:red;">Editor: </font><b>Dr. G.G. Parikh</b> | <font style="color:red;">Associate Editor: </font><b>Neeraj Jain</b> | <font style="color:red;">Managing Editor: </font><b>Guddi</b>
                                                     </p>
+                                                    <br/>
+                                                    <p style="font-family: Georgia, Times, Arial, sans-serif;background-color:grey; color:#FFF">
+  <i>Janata Weekly does not necessarily adhere to all of the views conveyed in articles republished by it. Our goal is to share a variety of democratic socialist perspectives that we think our readers will find interesting or useful. —Eds.</i>
+														</p>
                                                     <hr>
                                                 </div>
                                             </td>
@@ -359,7 +361,7 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
                                                             <div class="hero-unit text-center">
                                                                 <div id="cover-image">
                                                                     <a href="https://janataweekly.org/subscribe">
-                                                                        <img class="img-fluid float-right" src="http://branchaweb.com/wats1010-product-page/Single_Tap.png" />
+                                                                        <img class="img-fluid float-right" src="https://janataweekly.org/wp-content/uploads/2021/11/Single_Tap.png" />
                                                                     </a>
                                                                 </div>
                                                             </div>

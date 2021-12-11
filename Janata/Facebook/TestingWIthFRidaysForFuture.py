@@ -4,6 +4,7 @@ import datetime
 import facebook
 from datetime import timezone
 import time
+from datetime import timedelta
 
 def getAuthorName(id):
 	conn = http.client.HTTPSConnection("janataweekly.org")
@@ -126,7 +127,6 @@ def publishArticle(mess,ti,url,murl,pageID,accesst):
         "picture": murl})
 		print (a)
 	except:
-		print("There is some error")
 		time.sleep(20)
 		publishArticle(mess,ti,url,murl,accesst,pageID)
 		"""
@@ -170,15 +170,12 @@ def publishingAllArticles(dates,pageID,access_token,summary,postsTobeDeleted):
 		'cache-control': "no-cache"
 		}
 
-	conn.request("GET", "/wp-json/wp/v2/posts?per_page=30")
-	res = conn.getresponse()
-	data = json.loads(res.read())
-
 	eachPostTime = {}
 
 	x = datetime.datetime.now()
 	todayDate = x.date()
 	issueDate = datetime.datetime(dates["current_issue_Date"][0],dates["current_issue_Date"][1],dates["current_issue_Date"][2]).date()
+	previousIssueDate = datetime.datetime(dates["previous_issue_Date"][0],dates["previous_issue_Date"][1],dates["previous_issue_Date"][2]).date()
 
 	elevenAM= datetime.datetime(dates["date_For_First_Seven_Articles"][0], dates["date_For_First_Seven_Articles"][1], dates["date_For_First_Seven_Articles"][2],dates["date_For_First_Seven_Articles"][3],dates["date_For_First_Seven_Articles"][4])
 	threePM = datetime.datetime(dates["date_For_Seven_To_Fourteen_Articles"][0], dates["date_For_Seven_To_Fourteen_Articles"][1], dates["date_For_Seven_To_Fourteen_Articles"][2],dates["date_For_Seven_To_Fourteen_Articles"][3],dates["date_For_First_Seven_Articles"][4])
@@ -200,6 +197,11 @@ def publishingAllArticles(dates,pageID,access_token,summary,postsTobeDeleted):
 	author= summary[0]['authors']
 	excerpt=summary[0]['excerpts']
 	title=summary[0]['titles']
+	nextIssueDate = issueDate+ timedelta(days=2)
+	conn.request("GET", "/wp-json/wp/v2/posts?per_page=30&after="+issueDate.strftime("%Y-%m-%dT%H:%M:%S")+"&before="+nextIssueDate.strftime("%Y-%m-%dT%H:%M:%S"))
+	res = conn.getresponse()
+	data = json.loads(res.read())
+
 	l=len(author)
 	if (l >29):
 		l = 29

@@ -60,12 +60,12 @@ def AbhivyaktiAndLokayatEnglishWhatsAppMessages(summary):
 		if (refDateObj.date() - datetime.datetime.strptime(data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
 			l=l+1
 
-	lokayatFooter = "-----------------------------------------------------------\n 📱 _Join Lokayat's English Whatsapp Channel:_\nhttps://chat.whatsapp.com/GZfbm0OcsTN5OfOsnoUGBU\n\n"
-	lokayatFooter += "📱 _लोकायतचे मराठी/हिंदी व्हाट्सएप चॅनेलला जॉईन करा:_\nhttps://chat.whatsapp.com/Gr322B7eE5f7dUCQfcbv5O\n\n"
+	lokayatFooter = "-----------------------------------------------------------\n 📱 _Join Lokayat's English Whatsapp Channel:_\nhttps://chat.whatsapp.com/E8EjevJvIyN8q3LourelZP\n\n"
+	lokayatFooter += "📱 _लोकायतचे मराठी/हिंदी व्हाट्सएप चॅनेलला जॉईन करा:_\nhttps://chat.whatsapp.com/L9EA1WMO0Xh2PK5sD5mgGQ\n\n"
 	lokayatFooter += "📱 _Like Janata Weekly Facebook page:_\nhttps://www.faceboook.com/janataweekly\n\n"
 
-	abhivyaktiFooter = "-----------------------------------------------------------\n 📱 _Join Abhivyakti's English Whatsapp Channel:_\nhttps://chat.whatsapp.com/DXy57v3gBLrGw1iH5eGxZl\n\n"
-	abhivyaktiFooter += "📱 _अभिव्यक्तीचे मराठी/हिंदी व्हाट्सएप चॅनेलला जॉईन करा:_\nhttps://chat.whatsapp.com/KMjJldi53sIL6ZXVVNGvRT\n\n"
+	abhivyaktiFooter = "-----------------------------------------------------------\n 📱 _Join Abhivyakti's English Whatsapp Channel:_\nhttps://chat.whatsapp.com/IYdOYT4MuCtDNhkgHoVKn0\n\n"
+	abhivyaktiFooter += "📱 _अभिव्यक्तीचे मराठी/हिंदी व्हाट्सएप चॅनेलला जॉईन करा:_\nhttps://chat.whatsapp.com/Cc2Mf0iD5728O1Kr7byL7H\n\n"
 	abhivyaktiFooter += "📱 _Like Janata Weekly Facebook page:_\nhttps://www.faceboook.com/janataweekly\n\n"
 	j=0
 	i=l
