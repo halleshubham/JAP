@@ -1,6 +1,6 @@
 # JAP
 
-An automation tool for creating draft posts on Wordpress using Rest API.
+An automation tool for creating draft posts on Wordpress using Rest API. It also supports automated compilation of HTML newsletter emails & facebook scheduling of posts with help of published posts & it's excerpt.
 
 ## Configuration
 
