@@ -4,13 +4,10 @@ import datetime
 import re
 
 
-creds_path="For FB.json"
-with open(creds_path, encoding='utf-8-sig')  as f:
-        creds=json.load(f)
-issue_date = '2021-12-05'
+issue_date = '2022-07-10'
 
 conn = http.client.HTTPSConnection("janataweekly.org")
-   
+
 headers = {
 	'content-type': "application/json",
 	'cache-control': "no-cache"
@@ -183,7 +180,7 @@ aboutJanata = '''<!-- Header image -->
                                                     </h1>
                                                     <h3>India's oldest Socialist Weekly!</h3>
                                                     <p>
-                                                        <b>Vol. 75, No. '''+ str(datetime.date.today().isocalendar()[1] - 4) +''' | '''+refDateObj.strftime('%d %B %Y')+''' Issue</b>
+                                                        <b>Vol. 76, No. '''+ str(datetime.date.today().isocalendar()[1] - 4) +''' | '''+refDateObj.strftime('%d %B %Y')+''' Issue</b>
                                                         <br/> <font style="color:red;">Editor: </font><b>Dr. G.G. Parikh</b> | <font style="color:red;">Associate Editor: </font><b>Neeraj Jain</b> | <font style="color:red;">Managing Editor: </font><b>Guddi</b>
                                                     </p>
                                                     <br/>
