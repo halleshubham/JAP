@@ -1,5 +1,5 @@
 import docx
-from pprint import pprint
+
 def get_summary_data(summaryfile):
     doc = docx.Document(summaryfile)
     file_data=[]
@@ -32,6 +32,13 @@ def get_summary_data(summaryfile):
 
     return summary_data
 
+def get_general_summary(summaryfile):
+    summary_data = get_summary_data(summaryfile)
+    general_summary = {
+                            'titles' :  [summary_data_dict['article_title'] for summary_data_dict in summary_data],
+                            'authors' : [summary_data_dict['article_author'] for summary_data_dict in summary_data],
+                            'exerpts' : [summary_data_dict['article_exerpt'] for summary_data_dict in summary_data]
+                      }
 
-
+    return general_summary
 

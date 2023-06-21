@@ -2,7 +2,7 @@ import json
 import os
 
 def get_creds():
-    creds_path="JAP_Authentication/jap_config.json"
+    creds_path="./article_publishing/Configs/jap_config.json"
     if os.path.exists(creds_path):
         with open(creds_path) as f:
             creds=json.load(f)

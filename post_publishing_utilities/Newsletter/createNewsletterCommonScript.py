@@ -1,13 +1,9 @@
 import http.client
 import json
 import datetime
-import re
 
 
-creds_path="For FB.json"
-with open(creds_path, encoding='utf-8-sig')  as f:
-        creds=json.load(f)
-issue_date = '2021-04-04'
+issue_date = '2022-09-04'
 
 conn = http.client.HTTPSConnection("janataweekly.org")
    
@@ -17,12 +13,12 @@ headers = {
 	}
 
 #Print Issue Data
-conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=669&after="+ issue_date +"T00:00:00")
+conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=669&after=" + issue_date + "T00:00:00")
 res = conn.getresponse()
 print_data = json.loads(res.read())
 
 #Blog Issue Data
-conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=521&after="+ issue_date +"T00:00:00")
+conn.request("GET", "/wp-json/wp/v2/posts?per_page=40&categories=521&after=" + issue_date + "T00:00:00")
 res1 = conn.getresponse()
 blog_data = json.loads(res1.read())
 
@@ -35,7 +31,7 @@ def getAuthorName(id):
 		'cache-control': "no-cache"
 		}
 
-	conn.request("GET", "/wp-json/wp/v2/users/"+str(id))
+	conn.request("GET", "/wp-json/wp/v2/users/" + str(id))
 	res = conn.getresponse()
 	data = json.loads(res.read())
 	return data["name"]
@@ -48,27 +44,27 @@ def renderInternalArticle(data):
                                             <td align="center">
                                                 <div class="hero-unit">
                                                     <div id="cover-image">
-                                                        <a href="'''+data["link"]+'''">
-                                                            <img class="img-fluid" src="'''+data["jetpack_featured_media_url"]+'''" />
+                                                        <a href="''' + data["link"] + '''">
+                                                            <img class="img-fluid" src="''' + data["jetpack_featured_media_url"] + '''" />
                                                         </a>
                                                     </div>
                                                     <div class="mt-1">
-                                                        <h5>'''+data["title"]["rendered"]+'''</h5>
+                                                        <h5>''' + data["title"]["rendered"] + '''</h5>
                                                     </div>
                                                     <div style="color:#ED00D1;" class="mt-1">
                                                         <h6>by
                                                             <b>
-                                                                <i>'''+getAuthorName(data["author"])+'''</i>
+                                                                <i>''' + getAuthorName(data["author"]) + '''</i>
                                                             </b>
                                                         </h6>
                                                     </div>
                                                     <div class="mt-1">
                                                         <p>
-                                                            <p>'''+data["excerpt"]["rendered"]+''' </p>
+                                                            <p>''' + data["excerpt"]["rendered"] + ''' </p>
                                                         </p>
                                                     </div>
                                                     <div>
-                                                        <a href="'''+data["link"]+'''">
+                                                        <a href="''' + data["link"] + '''">
                                                             <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">Read full article</button>
                                                         </a>
                                                     </div>
@@ -186,7 +182,7 @@ aboutJanata = '''<!-- Header image -->
                                                     </h1>
                                                     <h3>India's oldest Socialist Weekly!</h3>
                                                     <p>
-                                                        <b>Vol. 75, No. '''+ str(datetime.date.today().isocalendar()[1] - 4) +''' | '''+refDateObj.strftime('%d %B %Y')+''' Issue</b>
+                                                        <b>Vol. 75, No. ''' + str(datetime.date.today().isocalendar()[1] - 4) + ''' | ''' + refDateObj.strftime('%d %B %Y') + ''' Issue</b>
                                                         <br/> <font style="color:red;">Editor: </font><b>Dr. G.G. Parikh</b> | <font style="color:red;">Associate Editor: </font><b>Neeraj Jain</b> | <font style="color:red;">Managing Editor: </font><b>Guddi</b>
                                                     </p>
                                                     <hr>
@@ -206,7 +202,7 @@ def renderCoverArticle(data,category):
                       <tr>
                             <td class="column"  align="center">
                                 <br>
-                                <h3 style="box-sizing:border-box;margin:0px;font-weight:500;line-height:1.6;font-size:1.75rem;background:yellow">'''+ category +'''</h3>
+                                <h3 style="box-sizing:border-box;margin:0px;font-weight:500;line-height:1.6;font-size:1.75rem;background:yellow">''' + category + '''</h3>
                                 <br>
                             </td>   
                         </tr>
@@ -219,28 +215,28 @@ def renderCoverArticle(data,category):
                                                 <div class="col-sm text-center">
                                                     <div class="hero-unit">
                                                         <div id="cover-image">
-                                                            <a href="'''+data["link"]+'''">
-                                                                <img class="img-fluid" src="'''+data["jetpack_featured_media_url"]+'''"
+                                                            <a href="''' + data["link"] + '''">
+                                                                <img class="img-fluid" src="''' + data["jetpack_featured_media_url"] + '''"
                                                                 />
                                                             </a>
                                                         </div>
                                                         <div class="mt-1">
-                                                            <h3>'''+data["title"]["rendered"]+'''</h3>
+                                                            <h3>''' + data["title"]["rendered"] + '''</h3>
                                                         </div>
                                                         <div style="color:#ED00D1;" class="mt-1">
                                                             <h5>by
                                                                 <b>
-                                                                    <i>'''+getAuthorName(data["author"])+'''</i>
+                                                                    <i>''' + getAuthorName(data["author"]) + '''</i>
                                                                 </b>
                                                             </h5>
                                                         </div>
                                                         <div class="mt-1">
                                                             <p>
-                                                                <p>'''+data["excerpt"]["rendered"]+'''</p>
+                                                                <p>''' + data["excerpt"]["rendered"] + '''</p>
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            <a href="'''+data["link"]+'''">
+                                                            <a href="''' + data["link"] + '''">
                                                                 <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">Read full article</button>
                                                             </a>
                                                         </div>
@@ -389,7 +385,7 @@ appealJoinJanatWeekly = '''<!-- Join Janata -->
                         </tr>
                     </table>
 '''
-contributeAppeal='''<!-- Contribute Janata -->
+contributeAppeal = '''<!-- Contribute Janata -->
                 <br>
                     <table width = "600" style="border:1px solid #ED00D1;" >
                         <tr>
@@ -427,21 +423,23 @@ contributeAppeal='''<!-- Contribute Janata -->
 def format_articles(data,length, category, strF,coverFlag):
     for i in range(0,length):
         #print(print_data[i]["author"])
-        #if (refDateObj.date() - datetime.datetime.strptime(print_data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days <= 3:
+        #if (refDateObj.date() -
+        #datetime.datetime.strptime(print_data[i]["date"],'%Y-%m-%dT%H:%M:%S').date()).days
+        #<= 3:
         if coverFlag == False :
             strF += renderCoverArticle(data[i],category)
             if category == "Print Issue":
                 strF += appealJoinJanatWeekly + contributeAppeal
             coverFlag = True
         else:
-            if (i%2) == 1:
+            if (i % 2) == 1:
                 strF += '''	<!-- Two columns -->
                     <table class="section mt-3" cellpadding="0" cellspacing="0">
                         <tr>'''
 
             strF += renderInternalArticle(data[i])
 
-            if (i%2) == 0 or i==(length-1):
+            if (i % 2) == 0 or i == (length - 1):
                 strF += ''' </tr>
                     </table>'''
   
@@ -460,6 +458,6 @@ strF += footerJanata
 strF += endOfHTML
 
 print(strF)
-f = open("Newsletter.html","w",encoding="UTF-8")
+f = open("./post_publishing_utilities/Artifacts/Newsletter.html","w",encoding="UTF-8")
 f.write(strF)
 f.close()

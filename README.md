@@ -4,9 +4,12 @@ An automation tool for creating draft posts on Wordpress using Rest API. It also
 
 ## Configuration
 
+### Installing dependencies
+Run the setup.py script.
+
 ### (When using this for the first time after clonning)
 
-1.  Create a **jap_config.json** file in **JAP_Authentication** folder with following content:
+1.  Create a **jap_config.json** file in **article_publishing/Config** folder with following content:
 
             {
 
@@ -16,7 +19,7 @@ An automation tool for creating draft posts on Wordpress using Rest API. It also
 
             }
 
-2.  Run **authorize.py** from **JAP_Authentication** folder and then follow the instructions.
+2.  Run **authorize.py** from **JAP_Utilities/JAP_Authentication** folder and then follow the instructions.
 3.  Once done, check the **jap_config.json** again, it should now have **resource_owner_key** and **resource_owner_secret** keys.
 4.  Done! You are all set now.
 

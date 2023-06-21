@@ -4,16 +4,16 @@ from requests_oauthlib import OAuth1
 import json
 import os
 
-creds_path="jap_config.json"
+creds_path = "./article_publishing/JAP_Authentication/jap_config.json"
 if os.path.exists(creds_path):
     with open(creds_path)  as f:
         creds=json.load(f)
 
 urls={
-        "request_token_url" : "http://janataweekly.org/oauth1/request",
-        "base_authorization_url" : "http://janataweekly.org/oauth1/authorize",
-        "access_token_url" : "http://janataweekly.org/oauth1/access",
-        "call_back_url" : "http://janataweekly.org/"
+        "request_token_url" : "https://janataweekly.org/oauth1/request",
+        "base_authorization_url" : "https://janataweekly.org/oauth1/authorize",
+        "access_token_url" : "https://janataweekly.org/oauth1/access",
+        "call_back_url" : "https://janataweekly.org/"
      }
 
 
@@ -50,7 +50,7 @@ token={
            "resource_owner_secret":resource_owner_secret  
        }
 
-with open("jap_config.json",'w') as f:
+with open("./article_publishing/Configs/jap_config.json",'w') as f:
     json.dump(token,f)
 
 print("Access token saved!")

@@ -11,3 +11,6 @@ jap_config.json
 For FB.json
 __pycache__
 article-publishing/env/*
+japenv/
+.vs/
+issue_params.json
