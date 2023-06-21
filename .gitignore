@@ -13,3 +13,4 @@ __pycache__
 article-publishing/env/*
 japenv/
 .vs/
+!requirements.txt
