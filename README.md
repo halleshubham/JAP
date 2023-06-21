@@ -9,7 +9,7 @@ Run the setup.py script.
 
 ### (When using this for the first time after clonning)
 
-1.  Create a **jap_config.json** file in **JAP_Utilities/JAP_Authentication** folder with following content:
+1.  Create a **jap_config.json** file in **article_publishing/Config** folder with following content:
 
             {
 
