@@ -40,22 +40,13 @@ def get_image_url(args):
     driver.get('https://www.google.com/imghp')
 
     # get the image source
-    searchTextbox = driver.find_element("xpath",'//*[@title="Search"]')
-    searchTextbox.send_keys(summary["titles"][2])
-    searchTextbox.send_keys(Keys.ENTER)
-    searchButton = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'//button[@aria-label="Google Search"]')))
-    searchButton.click()
-    textBox = WebDriverWait(driver,10).until(EC.presence_of_element_located((By.XPATH,'//*[@title="Search"]')))
-    textBox.clear()
-
-    textBox = driver.find_element("xpath",'//input[@title="Search"]')
-
-    textBox.send_keys(search_text)
+    searchTextbox = driver.find_element("xpath",'//*[@title="Search"]')   
+    searchTextbox.send_keys(search_text)
     searchButton = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'//*[@aria-label="Google Search"]')))
     searchButton.click()
 
     try:
-        img = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'//*[@id="islrg"]/div[1]/div[1]')))
+        img = WebDriverWait(driver,10).until(EC.element_to_be_clickable((By.XPATH,'//*[@id="islrg"]/div[1]/div[1]/a[1]/div[1]/img')))
         img.click()
 
     except Exception as e:
