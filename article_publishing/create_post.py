@@ -3,11 +3,12 @@ import os
 from JAP_Utilities.jap import upload_images,get_authors_list,add_authors,create_post,delete_images
 from JAP_Utilities.summary_parser import get_summary_data
 from JAP_Utilities.params_parser import get_params
-from datetime import datetime
+from datetime import date, datetime
 import mammoth
 import os
 import docx
 from bs4 import BeautifulSoup
+from multiprocessing import Pool, cpu_count
 
 def checkIfAnyElementIsToBeRemoved(tag,title,author):
     if (tag.text == '' and (tag.img == None)):
@@ -138,137 +139,147 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
         imageElement['class'] = "aligncenter"
     return str(soup)
 
+if __name__ == '__main__':
+    print("Total CPUs being used: ", cpu_count())
+    creds = get_creds()
+    start_time = datetime.now();
+    if creds:
 
-creds = get_creds()
+        # getting the parameters from issue_params.json
+        params = get_params()
 
-if creds:
-
-    # getting the parameters from issue_params.json
-    params = get_params()
-
-    # getting Summary data
-    summaryfile = params['summaryfile']
-    summary_data = get_summary_data(summaryfile)
+        # getting Summary data
+        summaryfile = params['summaryfile']
+        summary_data = get_summary_data(summaryfile)
     
-    # getting articles files
-    articles_folder_path = params['articles_folder_path']
-    artilces_files = {}
-    for article in os.listdir(articles_folder_path):
-        article_number = article.split('-')[0]
-        artilces_files[article_number] = article
+        # getting articles files
+        articles_folder_path = params['articles_folder_path']
+        artilces_files = {}
+        for article in os.listdir(articles_folder_path):
+            article_number = article.split('-')[0]
+            artilces_files[article_number] = article
 
 
-    # Adding authors
-    authors_list = get_authors_list(summary_data)
-    authors_ids = add_authors(authors_list,creds)
-    print('\n------------------------------------------------------------\n')
+        # Adding authors
+        authors_list = get_authors_list(summary_data)
+        authors_ids = add_authors(authors_list,creds)
+        print('\n------------------------------------------------------------\n')
 
 
-    if authors_ids:
+        if authors_ids:
 
-        for i in range(len(artilces_files)):
-                try:
-                    artilce_path = articles_folder_path + artilces_files[str(int(i) + 1)]
-                    try:
-                        article_content = convertDocxToHtml(artilce_path, summary_data[i])
-
-                    except Exception as e:
-                        print('There is some issue with getting Html From Beautiful Soup')
-                except Exception as e:
-                    print(e)
-        # Uploading images
-        images_folder_path = params['images_folder_path']
-        image_dict = upload_images(images_folder_path,creds,len(authors_ids))
-        
-        # initializing publish date
-        publish_date = params['publish_date']
-        publish_time_hour = '1'
-
-        posts_created = []
-        posts_not_created = []
-
-        if image_dict['status']:
-            print_edition_articles = params["print_edition_articles"]
-            blog_edition_articles = params["blog_edition_articles"]
-            image_ids = image_dict['image_ids']
-            print(image_ids)
-            print('\n------------------------------------------------------------\n')
             for i in range(len(artilces_files)):
-                try:
-                    artilce_path = articles_folder_path + artilces_files[str(int(i) + 1)]
                     try:
-                        article_content = convertDocxToHtml(artilce_path, summary_data[i])
-                        #article_content = result.value
-                        #with open(artilce_path, "rb") as docx_file:
-                        #    result = mammoth.convert_to_html(docx_file)
-                        #    article_content = result.value
+                        artilce_path = articles_folder_path + artilces_files[str(int(i) + 1)]
+                        try:
+                            article_content = convertDocxToHtml(artilce_path, summary_data[i])
+
+                        except Exception as e:
+                            print('There is some issue with getting Html From Beautiful Soup')
                     except Exception as e:
-                        print('There is some issue with getting Html From Beautiful Soup')
+                        print(e)
+            # Uploading images
+            images_folder_path = params['images_folder_path']
+            image_dict = upload_images(images_folder_path,creds,len(authors_ids))
+            
 
-                    total_articles = len(image_ids)
-                    total_articles = len(image_ids)
-                    publish_min = str((total_articles + 1) - int(summary_data[i]['article_number']))   #for publishing the articles in reverse order
-                    date_str = publish_date + 'T' + publish_time_hour + ':' + publish_min + ':00'
-                    article_date = datetime.strptime(date_str,'%Y-%m-%dT%H:%M:%S')  
+            # initializing publish date
+            publish_date = params['publish_date']
+            publish_time_hour = '1'
 
-                    article_title = summary_data[i]['article_title']
+            posts_created = []
+            posts_not_created = []
 
-                    article_exerpt = summary_data[i]['article_exerpt']
-                    article_slug = article_title
-                    article_image_id = image_ids[str(int(i) + 1)]
-                    article_author_id = authors_ids[i]
+            if image_dict['status']:
+                print_edition_articles = params["print_edition_articles"]
+                blog_edition_articles = params["blog_edition_articles"]
+                image_ids = image_dict['image_ids']
+                total_publish_payload = []
+                print(image_ids)
+                print('\n------------------------------------------------------------\n')
+                for i in range(len(artilces_files)):
+                    try:
+                        artilce_path = articles_folder_path + artilces_files[str(int(i) + 1)]
+                        try:
+                            article_content = convertDocxToHtml(artilce_path, summary_data[i])
+                            #article_content = result.value
+                            #with open(artilce_path, "rb") as docx_file:
+                            #    result = mammoth.convert_to_html(docx_file)
+                            #    article_content = result.value
+                        except Exception as e:
+                            print('There is some issue with getting Html From Beautiful Soup')
 
-                    if (i + 1) >= print_edition_articles[0] and (i + 1) <= print_edition_articles[1]:
-                        categories = "669" #id for published category
-                    elif (i + 1) >= blog_edition_articles[0] and (i + 1) <= blog_edition_articles[1]:
-                         categories = "521" #id for blog category
-                    else: 
-                        categories = "521" 
+                        total_articles = len(image_ids)
+                        total_articles = len(image_ids)
+                        publish_min = str((total_articles + 1) - int(summary_data[i]['article_number']))   #for publishing the articles in reverse order
+                        date_str = publish_date + 'T' + publish_time_hour + ':' + publish_min + ':00'
+                        article_date = datetime.strptime(date_str,'%Y-%m-%dT%H:%M:%S')  
 
-                    data = {
-                            'status':'draft',
-                            'title' : article_title,
-                            'content' : article_content,
-                            'slug': article_slug,
-                            'excerpt' : article_exerpt,
-                            'featured_media':article_image_id,
-                            'author': article_author_id,
-                            'date': article_date,
-                            'categories' : categories
-                        }
+                        article_title = summary_data[i]['article_title']
 
-                    create_post_status = create_post(data,creds)
+                        article_exerpt = summary_data[i]['article_exerpt']
+                        article_slug = article_title
+                        article_image_id = image_ids[str(int(i) + 1)]
+                        article_author_id = authors_ids[i]
 
-                    if create_post:
-                        posts_created.append(article_title)
-                        print("Post created for article: " + str(i + 1))
-                    else:
+                        if (i + 1) >= print_edition_articles[0] and (i + 1) <= print_edition_articles[1]:
+                            categories = "669" #id for published category
+                        elif (i + 1) >= blog_edition_articles[0] and (i + 1) <= blog_edition_articles[1]:
+                             categories = "521" #id for blog category
+                        else: 
+                            categories = "521" 
+
+                        data = {
+                                'status':'draft',
+                                'title' : article_title,
+                                'content' : article_content,
+                                'slug': article_slug,
+                                'excerpt' : article_exerpt,
+                                'featured_media':article_image_id,
+                                'author': article_author_id,
+                                'date': article_date,
+                                'categories' : categories
+                            }    
+                        total_publish_payload.append((data, creds))
+
+                    except Exception as e:
+                        print(e)
+                        print("Could not create the draft for the article " + article_title)
+                        delete_images(list(image_dict['image_ids'].values()),creds)
                         posts_not_created.append(article_title)
-                        print("Post could not be created for article: " + str(i + 1))
-                    
-                except Exception as e:
-                    print(e)
-                    print("Could not create the draft for the article " + article_title)
+                        break
+
+                with Pool() as pool:
+                    results = pool.map(create_post, total_publish_payload)
+                statuses = []
+                for result in results:
+                    if result['status']:
+                        posts_created.append(result['article_title'])
+                    else:
+                        posts_not_created.append(result['article_title'])
+                    statuses.append(result['status'])
+                
+                if not all(statuses):
                     delete_images(list(image_dict['image_ids'].values()),creds)
-                    posts_not_created.append(article_title)
-                    break
-            print('\n------------------------------------------------------------\n')
-            print('Posts created for ' + str(len(posts_created)) + ' articles :')
-            for i in range(len(posts_created)):
-                print(str(i + 1) + '. ' + posts_created[i])
-            print('\n------------------------------------------------------------\n')
 
-            if len(posts_created) == len(artilces_files):
-                print('Posts created for all the articles!')
+                print('\n------------------------------------------------------------\n')
+                print('Posts created for ' + str(len(posts_created)) + ' articles :')
+                for i in range(len(posts_created)):
+                    print(str(i + 1) + '. ' + posts_created[i])
+                print('\n------------------------------------------------------------\n')
+
+                if len(posts_created) == len(artilces_files):
+                    print('Posts created for all the articles!')
+                else:
+                    print('Posts could not be created for ' + str(len(posts_not_created)) + ' articles :')
+                    for i in range(len(posts_not_created)):
+                        print(str(i + 1) + '. ' + posts_not_created[i]) 
+                
+                end_time = datetime.now()
+                print("Script finished in:"+ str((end_time - start_time).seconds) +' seconds.')
             else:
-                print('Posts could not be created for ' + str(len(posts_not_created)) + ' articles :')
-                for i in range(len(posts_not_created)):
-                    print(str(i + 1) + '. ' + posts_not_created[i]) 
-
-           
+                print(image_dict['message'])
+                delete_images(list(image_dict['image_ids'].values()),creds)
         else:
-            print(image_dict['message'])
-            delete_images(list(image_dict['image_ids'].values()),creds)
-    else:
-        print("Unable to create all the authors! Script stopped.")
+            print("Unable to create all the authors! Script stopped.")
                 
