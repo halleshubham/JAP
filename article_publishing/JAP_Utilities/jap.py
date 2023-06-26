@@ -144,7 +144,6 @@ def add_authors(authors_list,creds):
             author_added_count = author_added_count + 1
         else:
             return False
-    print('Total authors created : ' + str(author_added_count))
     return author_ids
 
 def upload_image(args):
