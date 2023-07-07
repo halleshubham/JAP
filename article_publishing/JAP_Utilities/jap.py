@@ -216,7 +216,7 @@ def delete_images(id_list,creds):
         total_delete_payload.append((image_id,creds))
     with Pool() as pool:
         results = pool.map(delete_image, total_delete_payload)
-    print("Deleted old images!")
+    print("Deleted the images uploaded in this session!")
 
 
 def create_post(args):
@@ -239,9 +239,33 @@ def create_post(args):
             return {'status': False, 'article_title': data['title']}
         else:
             print("Post created for article: ", data['title'])
-            return {'status': True, 'article_title': data['title']}
+            article_id = r.json()['id']
+            return {'status': True, 'article_title': data['title'], 'article_id':article_id}
     except Exception as e:
         print(e)
         print("Could not create the draft for the article ", data['title'])
         return {'status': False, 'article_title': data['title']}
 
+def delete_post(args):
+    (article_id,creds) = args
+    headers = { 
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                     
+                }
+    oauth = OAuth1Session(creds['client_key'],
+                                client_secret=creds['client_secret'],
+                                resource_owner_key=creds['resource_owner_key'],
+                                resource_owner_secret=creds['resource_owner_secret'])
+    protected_url = 'https://janataweekly.org/wp-json/wp/v2/posts/' + str(article_id) + '?force=true'
+    r = oauth.delete(protected_url,headers=headers)
+    if r.status_code != 200:
+        print(r.status_code)
+        print(r.text)
+
+def delete_posts(id_list,creds):
+    total_delete_payload = []
+    for article_id in id_list:
+        total_delete_payload.append((article_id,creds))
+    with Pool() as pool:
+        results = pool.map(delete_post, total_delete_payload)
+    print("Deleted the draft posts created in this session!")
