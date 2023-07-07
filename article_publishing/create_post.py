@@ -1,6 +1,6 @@
 from JAP_Utilities.JAP_Authentication.authenticate import get_creds
 import os
-from JAP_Utilities.jap import upload_images,get_authors_list,add_authors,create_post,delete_images
+from JAP_Utilities.jap import upload_images,get_authors_list,add_authors,create_post,delete_images,delete_posts
 from JAP_Utilities.summary_parser import get_summary_data
 from JAP_Utilities.params_parser import get_params
 from datetime import date, datetime
@@ -252,15 +252,18 @@ if __name__ == '__main__':
                 with Pool() as pool:
                     results = pool.map(create_post, total_publish_payload)
                 statuses = []
+                article_ids = []
                 for result in results:
                     if result['status']:
                         posts_created.append(result['article_title'])
+                        article_ids.append(result['article_id'])
                     else:
                         posts_not_created.append(result['article_title'])
                     statuses.append(result['status'])
                 
                 if not all(statuses):
                     delete_images(list(image_dict['image_ids'].values()),creds)
+                    delete_posts(article_ids,creds)
 
                 print('\n------------------------------------------------------------\n')
                 print('Posts created for ' + str(len(posts_created)) + ' articles :')
