@@ -217,7 +217,7 @@ if __name__ == '__main__':
 
                         article_title = summary_data[i]['article_title']
 
-                        article_exerpt = summary_data[i]['article_exerpt']
+                        article_excerpt = summary_data[i]['article_excerpt']
                         article_slug = article_title
                         article_image_id = image_ids[str(int(i) + 1)]
                         article_author_id = authors_ids[i]
@@ -234,7 +234,7 @@ if __name__ == '__main__':
                                 'title' : article_title,
                                 'content' : article_content,
                                 'slug': article_slug,
-                                'excerpt' : article_exerpt,
+                                'excerpt' : article_excerpt,
                                 'featured_media':article_image_id,
                                 'author': article_author_id,
                                 'date': article_date,

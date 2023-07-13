@@ -19,14 +19,14 @@ def get_summary_data(summaryfile):
         if article_author_pre[0] == 'by':
             article_author_pre.remove('by')
         article_author = ' '.join(article_author_pre).strip(' ')
-        article_exerpt = file_data[i+2]
+        article_excerpt = file_data[i+2]
  
         summary_data.append(
                             {
                                 'article_number' : article_number,
                                 'article_title' : article_title,
                                 'article_author' : article_author,
-                                'article_exerpt' : article_exerpt
+                                'article_excerpt' : article_excerpt
                             }
                         )      
 
@@ -37,7 +37,7 @@ def get_general_summary(summaryfile):
     general_summary = {
                             'titles' :  [summary_data_dict['article_title'] for summary_data_dict in summary_data],
                             'authors' : [summary_data_dict['article_author'] for summary_data_dict in summary_data],
-                            'exerpts' : [summary_data_dict['article_exerpt'] for summary_data_dict in summary_data]
+                            'excerpts' : [summary_data_dict['article_excerpt'] for summary_data_dict in summary_data]
                       }
 
     return general_summary

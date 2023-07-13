@@ -3,6 +3,9 @@ from multiprocessing import Pool
 import os
 from pprint import pprint
 import unidecode
+from slugify import slugify
+import requests
+
 
 def get_authors_list(summary_data):
     authors_list = []
@@ -269,3 +272,24 @@ def delete_posts(id_list,creds):
     with Pool() as pool:
         results = pool.map(delete_post, total_delete_payload)
     print("Deleted the draft posts created in this session!")
+
+def get_article_link(article_title):
+    article_link = "https://janataweekly.org/" + slugify(article_title, to_lower=True)
+
+	#checking the link
+    headers = { 
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                     
+                }
+    response = requests.get(article_link, headers=headers)
+    if response.status_code != 200:
+        print("Could not get the link for the article: " +article_title)
+        return False
+    else:
+        return (article_title, article_link)
+
+def get_article_links(article_titles):
+    with Pool() as pool:
+        results = pool.map(get_article_link, article_titles)
+
+    return results
