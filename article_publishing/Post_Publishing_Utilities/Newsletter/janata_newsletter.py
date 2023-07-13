@@ -18,6 +18,7 @@ def generate_newsletter(summary, publish_date, print_edition_articles, volume_nu
     html_section_three_print_articles = ''
     if print_length > 0:
         html_section_two_print_cover = generate_cover_article(print_data[0], "Print Issue")
+        html_section_two_print_cover += appeal_join_janatweekly + contribute_appeal
         html_section_three_print_articles = generate_articles(print_data[1:], print_length-1)
     
     html_section_four_blog_cover = ''
@@ -25,6 +26,8 @@ def generate_newsletter(summary, publish_date, print_edition_articles, volume_nu
 
     if blog_length > 0: 
         html_section_four_blog_cover = generate_cover_article(blog_data[0], "Blog")
+        if print_length == 0:
+            html_section_four_blog_cover += appeal_join_janatweekly + contribute_appeal
         html_section_five_blog_articles = generate_articles(blog_data[1:], blog_length-1)
 
     html_section_six_end = footer_janata + end_of_html
@@ -63,7 +66,7 @@ def generate_internal_article(data):
                                                             <p>''' + data['article_data']["excerpt"]["rendered"] + ''' </p>
                                                         </p>
                                                     </div>
-                                                    <div>
+                                                    <div style = "margin-top:10px">
                                                         <a href="''' + data['article_data']["link"] + '''">
                                                             <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">Read full article</button>
                                                         </a>
@@ -145,7 +148,7 @@ def generate_cover_article(data,category):
                                                                 <p>''' + data['article_data']["excerpt"]["rendered"] + '''</p>
                                                             </p>
                                                         </div>
-                                                        <div>
+                                                        <div style = "margin-bottom:15px ; margin-top:10px">
                                                             <a href="''' + data['article_data']["link"] + '''">
                                                                 <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">Read full article</button>
                                                             </a>
@@ -283,6 +286,85 @@ janata_diclaimer = '''<!-- Janata Disclaimer -->
 								</td>   
 							</tr>				
 						</table>  '''
+
+appeal_join_janatweekly = '''<!-- Join Janata -->
+                    <table class="section header mt-1" cellpadding="0" cellspacing="0" width="600" style="background: yellow;">
+                        <tr>
+                            <td class="column">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td align="center">
+                                                <div class="col-sm">
+                                                    <div class="row mt-1">
+                                                        <div class="col-sm-4">
+                                                            <div class="hero-unit text-center">
+                                                                <div id="cover-image">
+                                                                    <a href="https://janataweekly.org/subscribe">
+                                                                        <img class="img-fluid float-right" src="https://janataweekly.org/wp-content/uploads/2021/11/Single_Tap.png" />
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-8 text-center">
+                                                            <div class="mt-1">
+                                                                <h4>Janata at your fingertips!</h4>
+                                                            </div>
+                                                            <div class="mt-1">
+                                                                <p>Fill below form and start receiving Janata Weekly directly
+                                                                    to your E-mail and WhatsApp for free!</p>
+                                                            </div>
+                                                            <div style="margin-bottom: 10px; margin-top: 15px;">
+                                                                <a href="https://janataweekly.org/subscribe">
+                                                                    <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">Fill Form Now!</button>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+'''
+
+contribute_appeal = '''<!-- Contribute Janata -->
+                <br>
+                    <table width = "600" style="border:1px solid #ED00D1;" >
+                        <tr>
+                            <td style="padding: 5px;">
+                            <div class="mt-1" >
+                                <h4 style="color: #ED00D1;"><b>Contribute to Janata Weekly</b></h4>
+                            </div>
+                            </td>
+                       
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/sfmrqk">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹500</button>
+                                        </a>
+                                    
+                                </td> 
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/vQZGqM">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹200</button>
+                                        </a>
+                                    
+                                </td>
+                                <td style="padding: 5px;">
+                                    
+                                        <a href="https://imjo.in/6Xf8af">
+                                            <button type="button" class="btn" style="background-color:#ED00D1; color:#FFF">₹50</button>
+                                        </a>
+                                    
+                                </td>        
+                            </tr>   
+                          
+                    </table>  '''
 
 footer_janata = '''
   <!--FOOTER-->
