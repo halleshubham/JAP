@@ -273,23 +273,43 @@ def delete_posts(id_list,creds):
         results = pool.map(delete_post, total_delete_payload)
     print("Deleted the draft posts created in this session!")
 
-def get_article_link(article_title):
-    article_link = "https://janataweekly.org/" + slugify(article_title, to_lower=True)
+def get_article_url(article_title):
+    article_url = "https://janataweekly.org/" + slugify(article_title, to_lower=True)
 
 	#checking the link
     headers = { 
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                      
                 }
-    response = requests.get(article_link, headers=headers)
+    response = requests.get(article_url, headers=headers)
     if response.status_code != 200:
-        print("Could not get the link for the article: " +article_title)
+        print("Could not get the url for the article: " +article_title)
         return False
     else:
-        return (article_title, article_link)
+        return (article_title, article_url)
 
-def get_article_links(article_titles):
+def get_article_urls(article_titles):
     with Pool() as pool:
-        results = pool.map(get_article_link, article_titles)
+        results = pool.map(get_article_url, article_titles)
 
+    return results
+
+def get_article_data(article_title):
+    headers = { 
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                     
+                }
+    url = 'https://janataweekly.org/wp-json/wp/v2/posts?slug=' + slugify(article_title, to_lower=True)
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        print("Could not get the image url for the article: "+ article_title)
+        return False
+    else:
+        j = response.json()[0]["jetpack_featured_media_url"]
+        return (article_title, response.json()[0])
+
+def get_articles_data(article_titles):
+    with Pool() as pool:
+        results = pool.map(get_article_data, article_titles)
+    
     return results
