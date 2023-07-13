@@ -13,7 +13,7 @@ def generate_lokayat_whatsapp_message(summary):
 	for i in range(0,total_articles_count):
 		message_section_one = "⭕ *"+summary[i]['article_title'].strip()+"*\n\n"
 		message_section_one += "✒️ "+summary[i]['article_author']+"\n\n_"+summary[i]['article_excerpt']+"_\n\n*Read full article:*\n"
-		message_section_one += summary[i]['article_link']+"\n\n"
+		message_section_one += summary[i]['article_url']+"\n\n"
 
 		final_message = message_separator + message_section_one + message_section_two		
 		file.write(final_message)
@@ -35,7 +35,7 @@ def generate_abhivyakti_whatsapp_message(summary):
 	for i in range(1,total_articles_count):
 		message_section_one += "⭕ *"+summary[i]['article_title'].strip()+"*\n\n"
 		message_section_one += "✒️ "+summary[i]['article_author']+"\n\n_"+summary[i]['article_excerpt']+"_\n\n*Read full article:*\n"
-		message_section_one += summary[i]['article_link']+"\n\n"
+		message_section_one += summary[i]['article_url']+"\n\n"
 
 		final_message = message_separator + message_section_one + message_section_two
 		file.write(final_message)

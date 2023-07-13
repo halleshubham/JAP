@@ -5,9 +5,11 @@
 
   "images_folder_path": "C:\\Users\\akshay.raut\\Downloads\\images\\",
 
-  "publish_date": "2023-06-11",
+  "publish_date": "2023-07-02",
 
-  "print_edition_articles": [ 1, 9 ],
+  "volume_number" : "77",
+
+  "print_edition_articles": [ 1,9 ],
 
   "blog_edition_articles": [ 10, 25 ]
 }
