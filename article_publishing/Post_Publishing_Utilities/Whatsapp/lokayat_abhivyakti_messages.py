@@ -33,7 +33,7 @@ def generate_abhivyakti_whatsapp_message(summary):
 
 	file = open("EnglishWhatsappMessagesWithAbhivyaktiFooter.txt","w",encoding="UTF-8")
 	for i in range(1,total_articles_count):
-		message_section_one += "⭕ *"+summary[i]['article_title'].strip()+"*\n\n"
+		message_section_one = "⭕ *"+summary[i]['article_title'].strip()+"*\n\n"
 		message_section_one += "✒️ "+summary[i]['article_author']+"\n\n_"+summary[i]['article_excerpt']+"_\n\n*Read full article:*\n"
 		message_section_one += summary[i]['article_url']+"\n\n"
 
