@@ -2,6 +2,7 @@ import time
 import requests
 from selenium import webdriver 
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait 
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.keys import Keys
@@ -12,7 +13,7 @@ from PIL import Image
 import io, base64
 from multiprocessing import Pool, cpu_count
 import datetime as dt
-
+from chromedriver_py import binary_path
 
 def download_image(args):
     (url, count) = args
@@ -34,9 +35,10 @@ def download_image(args):
 
 def get_image_url(args):
     (search_text, image_number) = args
+    service_object = Service(binary_path)
     options = Options()
     options.add_argument('--headless=new')
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options, service=service_object)
     #driver = webdriver.Chrome()
     driver.get('https://www.google.com/imghp')
 
