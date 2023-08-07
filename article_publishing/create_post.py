@@ -2,7 +2,7 @@ from JAP_Utilities.JAP_Authentication.authenticate import get_creds
 import os
 from JAP_Utilities.jap import upload_images,get_authors_list,add_authors,create_post,delete_images,delete_posts
 from JAP_Utilities.summary_parser import get_summary_data
-from JAP_Utilities.params_parser import get_params
+from JAP_Utilities.configs_parser import get_params
 from datetime import date, datetime
 import mammoth
 import os

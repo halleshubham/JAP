@@ -1,15 +1,15 @@
 {
   "summaryfile": "C:\\Users\\akshay.raut\\Downloads\\Summary.docx",
 
-  "articles_folder_path": "C:\\Users\\akshay.raut\\Downloads\\janataarticles11june2023\\",
+  "articles_folder_path": "C:\\Users\\akshay.raut\\Downloads\\articlesforjanata30july2023\\",
 
-  "images_folder_path": "C:\\Users\\akshay.raut\\Downloads\\images\\",
+  "images_folder_path": "C:\\Users\\akshay.raut\\Downloads\\images1\\",
 
-  "publish_date": "2023-07-02",
+  "publish_date": "2023-07-30",
 
-  "volume_number" : "77",
+  "volume_number": "77",
 
-  "print_edition_articles": [ 1,9 ],
+  "print_edition_articles": [ 0, 0 ],
 
-  "blog_edition_articles": [ 10, 25 ]
+  "blog_edition_articles": [ 1, 25 ]
 }

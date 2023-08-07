@@ -3,11 +3,9 @@ import requests
 from requests_oauthlib import OAuth1
 import json
 import os
+from creds_parser import get_creds
 
-creds_path = "./article_publishing/JAP_Authentication/jap_config.json"
-if os.path.exists(creds_path):
-    with open(creds_path)  as f:
-        creds=json.load(f)
+creds = get_creds
 
 urls={
         "request_token_url" : "https://janataweekly.org/oauth1/request",
