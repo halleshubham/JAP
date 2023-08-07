@@ -122,6 +122,11 @@ def download_image_google_api(args):
 
      gis.search(search_params = search_params, path_to_dir = params['images_folder_path'], custom_image_name = str(image_number))
 
+     image_path = os.path.join(params['images_folder_path'],str(image_number)+".jpg")
+     if(os.path.getsize(image_path)>1000000):
+         resize_image(image_path)
+
+
 def download_images_google_api(summary):
     total_download_payload = []
     for i in range(0,len(summary["titles"])):
@@ -144,6 +149,16 @@ def download_images_google_api(summary):
     with Pool(cpu_count()-2) as pool:
         results = pool.map(download_image_google_api, total_download_payload)
     return total_download_payload
+
+
+def resize_image(image_path):
+    while(os.path.getsize(image_path)>1000000):
+         img = Image.open(image_path)
+         (width, height) = img.size
+         new_width= int(width/2)
+         new_height = int(height/2)
+         img = img.resize((new_width, new_height))
+         img.save(image_path)
 
 cred = get_creds()
 params = get_params()
