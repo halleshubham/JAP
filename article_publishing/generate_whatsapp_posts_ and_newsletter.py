@@ -1,5 +1,5 @@
 ﻿from JAP_Utilities.summary_parser import get_summary_data
-from JAP_Utilities.params_parser import get_params
+from JAP_Utilities.configs_parser import get_params
 from JAP_Utilities.jap import get_article_urls, get_articles_data
 from Post_Publishing_Utilities.Whatsapp.janata_whatsapp_messages import generate_janata_whatsapp_messages
 from Post_Publishing_Utilities.Whatsapp.lokayat_abhivyakti_messages import generate_lokayat_whatsapp_message, generate_abhivyakti_whatsapp_message

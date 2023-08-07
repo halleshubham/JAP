@@ -85,7 +85,9 @@ def create_author(args):
                                 resource_owner_secret=creds['resource_owner_secret'])
         r = oauth.post(protected_url,headers=headers,data=data)
         if r.status_code == 201:
+            print('Author ' + author + ' added.')
             return r.json()['id']
+            
         else:
             error = r.json()
             if error['code'] == 'existing_user_email' or error['code'] == 'existing_user_login':

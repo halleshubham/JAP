@@ -15,7 +15,11 @@ Run the setup.py script.
 
                 "client_key": <client key>,
 
-                "client_secret": <client secret>
+                "client_secret": <client secret>,
+
+                "google_api_key": <google_api_key>,
+
+	            "google_project_cx": "<search_engine_ID>"
 
             }
 
