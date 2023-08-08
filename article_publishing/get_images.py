@@ -145,9 +145,9 @@ def download_images_google_api(summary):
       
         search_text = searchTitle + " " + searchAuthor
         total_download_payload.append((search_text, i+1))
-
+    
     with Pool(cpu_count()-2) as pool:
-        results = pool.map(download_image_google_api, total_download_payload)
+       results = pool.map(download_image_google_api, total_download_payload)
     return total_download_payload
 
 
@@ -158,6 +158,9 @@ def resize_image(image_path):
          new_width= int(width/2)
          new_height = int(height/2)
          img = img.resize((new_width, new_height))
+         if img.mode in ('RGBA', 'P'):
+            img = img.convert('RGB')
+
          img.save(image_path)
 
 cred = get_creds()
