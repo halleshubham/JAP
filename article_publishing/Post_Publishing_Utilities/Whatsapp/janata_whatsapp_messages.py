@@ -16,7 +16,7 @@ def generate_janata_whatsapp_messages(summary, publish_date, volume_number):
 
 	message_section_one = '📮 *Janata Weekly*\n'
 	message_section_one += 'India\'s oldest socialist magazine!\n\n'
-	message_section_three = 'Vol.' + volume_number+', No. '+ str(publish_date.isocalendar()[1] - 4) +' | '+ publish_date.strftime('%d %B, %Y')+' Issue\n\n'
+	message_section_three = 'Vol.' + volume_number+', No. '+ str(publish_date.isocalendar()[1] - 5) +' | '+ publish_date.strftime('%d %B, %Y')+' Issue\n\n'
 	message_section_three += 'Editor: Dr.G.G. Parikh \nAssociate Editor: Neeraj Jain \nManaging Editor: Guddi\n\n'
 
 	message_section_five = "\n➖➖➖➖➖➖➖➖➖➖➖\n\n📋 *About Janata Weekly :*\nJanata Weekly is an *independent socialist journal*. It has raised its challenging voice of principled dissent against all conduct and practice that is detrimental to the cherished values of nationalism, democracy, secularism and socialism, while upholding the integrity and the ethical norms of healthy journalism. It has the enviable reputation of being the oldest continuously published socialist journal in India."

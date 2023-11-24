@@ -1,4 +1,5 @@
-from JAP_Utilities.JAP_Authentication.authenticate import get_creds
+from time import strftime
+from JAP_Utilities.JAP_Authentication.creds_parser import get_creds
 import os
 from JAP_Utilities.jap import upload_images,get_authors_list,add_authors,create_post,delete_images,delete_posts
 from JAP_Utilities.summary_parser import get_summary_data
@@ -9,6 +10,7 @@ import os
 import docx
 from bs4 import BeautifulSoup
 from multiprocessing import Pool, cpu_count
+from slugify import slugify
 
 def checkIfAnyElementIsToBeRemoved(tag,title,author):
     if (tag.text == '' and (tag.img == None)):
@@ -214,11 +216,12 @@ if __name__ == '__main__':
                         publish_min = str((total_articles + 1) - int(summary_data[i]['article_number']))   #for publishing the articles in reverse order
                         date_str = publish_date + 'T' + publish_time_hour + ':' + publish_min + ':00'
                         article_date = datetime.strptime(date_str,'%Y-%m-%dT%H:%M:%S')  
+                        
 
                         article_title = summary_data[i]['article_title']
-
+                        article_slug = slugify(article_title, to_lower=True)
                         article_excerpt = summary_data[i]['article_excerpt']
-                        article_slug = article_title
+                        #article_slug = slugify(article_title,to_lower=True)+"_"+ strftime(datetime.strptime(publish_date,'%Y-%m-%D'),"%d%m%Y") 
                         article_image_id = image_ids[str(int(i) + 1)]
                         article_author_id = authors_ids[i]
 
@@ -262,7 +265,9 @@ if __name__ == '__main__':
                     statuses.append(result['status'])
                 
                 if not all(statuses):
+                    print("Deleteing the images...")
                     delete_images(list(image_dict['image_ids'].values()),creds)
+                    print("Deleting the draft posts...")
                     delete_posts(article_ids,creds)
 
                 print('\n------------------------------------------------------------\n')

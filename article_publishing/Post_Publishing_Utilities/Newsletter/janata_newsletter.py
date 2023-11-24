@@ -95,7 +95,7 @@ def generate_about_janata(publish_date, volume_number):
                                                         </h1>
                                                         <h3>India's oldest Socialist Weekly!</h3>
                                                         <p>
-                                                            <b>Vol. '''+ volume_number +''', No. ''' + str(publish_date.isocalendar()[1] - 4) + ''' | ''' + publish_date.strftime('%d %B %Y') + ''' Issue</b>
+                                                            <b>Vol. '''+ volume_number +''', No. ''' + str(publish_date.isocalendar()[1] - 5) + ''' | ''' + publish_date.strftime('%d %B %Y') + ''' Issue</b>
                                                             <br/> <font style="color:red;">Editor: </font><b>Dr. G.G. Parikh</b> | <font style="color:red;">Associate Editor: </font><b>Neeraj Jain</b> | <font style="color:red;">Managing Editor: </font><b>Guddi</b>
                                                         </p>
                                                         <hr>
