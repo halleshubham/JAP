@@ -43,7 +43,13 @@ Run the setup.py script.
 
                 "print_edition_articles" : [<print edition first article number>,<print edition last article number>],
 
-                "blog_edition_articles" : [<blog edition first article number>,<blog edition last article number>]
+                "blog_edition_articles" : [<blog edition first article number>,<blog edition last article number>],
+
+                "volume_number": "Volume Number",
+  
+                "issue_number" : "Issue Number",
+
+
             }
 
 
