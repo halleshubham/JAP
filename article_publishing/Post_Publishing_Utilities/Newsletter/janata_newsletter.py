@@ -1,6 +1,6 @@
-def generate_newsletter(summary, publish_date, print_edition_articles, volume_number):
+def generate_newsletter(summary, publish_date, print_edition_articles, volume_number, issue_number):
 
-    html_section_one_init = init_html + generate_about_janata(publish_date, volume_number) + janata_diclaimer + appeal_forward_janatweekly
+    html_section_one_init = init_html + generate_about_janata(publish_date, volume_number, issue_number) + janata_diclaimer + appeal_forward_janatweekly
     print_data = []
     blog_data = []
 
@@ -78,7 +78,7 @@ def generate_internal_article(data):
                                 </table>
                             </td>'''
 
-def generate_about_janata(publish_date, volume_number):
+def generate_about_janata(publish_date, volume_number, issue_number):
     return '''<!-- Header image -->
                         <table class="section header" cellpadding="0" cellspacing="0" width="600">
                             <tr>
@@ -95,7 +95,7 @@ def generate_about_janata(publish_date, volume_number):
                                                         </h1>
                                                         <h3>India's oldest Socialist Weekly!</h3>
                                                         <p>
-                                                            <b>Vol. '''+ volume_number +''', No. ''' + str(publish_date.isocalendar()[1] - 5) + ''' | ''' + publish_date.strftime('%d %B %Y') + ''' Issue</b>
+                                                            <b>Vol. '''+ volume_number +''', No. ''' + issue_number + ''' | ''' + publish_date.strftime('%d %B %Y') + ''' Issue</b>
                                                             <br/> <font style="color:red;">Editor: </font><b>Dr. G.G. Parikh</b> | <font style="color:red;">Associate Editor: </font><b>Neeraj Jain</b> | <font style="color:red;">Managing Editor: </font><b>Guddi</b>
                                                         </p>
                                                         <hr>

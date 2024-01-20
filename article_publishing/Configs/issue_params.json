@@ -1,13 +1,15 @@
 {
-  "summaryfile": "C:\\Users\\akshay.raut\\Downloads\\Summary.docx",
+  "summaryfile": "C:\\Users\\aindrayani\\Downloads\\Summary.docx",
 
-  "articles_folder_path": "C:\\Users\\akshay.raut\\Downloads\\articlesforjanata30july2023\\",
+  "articles_folder_path": "C:\\Users\\aindrayani\\Downloads\\janataarticles714jan\\",
 
-  "images_folder_path": "C:\\Users\\akshay.raut\\Downloads\\images1\\",
+  "images_folder_path": "C:\\Users\\aindrayani\\Downloads\\images\\",
 
-  "publish_date": "2023-07-30",
+  "publish_date": "2024-01-14",
 
-  "volume_number": "77",
+  "volume_number": "78",
+  
+  "issue_number" : "1",
 
   "print_edition_articles": [ 0, 0 ],
 

@@ -29,7 +29,7 @@ if __name__ == '__main__':
         publish_date = datetime.strptime(params['publish_date'], '%Y-%m-%d')
 
         print("Generating Whatsapp messages for Janata channels..")
-        generate_janata_whatsapp_messages(summary, publish_date, params["volume_number"])
+        generate_janata_whatsapp_messages(summary, publish_date, params["volume_number"], params["issue_number"])
 
         print("Generating Whatsapp messages for Lokayat channels..")
         generate_lokayat_whatsapp_message(summary)
@@ -48,7 +48,7 @@ if __name__ == '__main__':
                 item['article_data'] = article_data_dict[item['article_title']]
 
             print("Generating Newsletter..")
-            generate_newsletter(summary, publish_date, params["print_edition_articles"], params["volume_number"])
+            generate_newsletter(summary, publish_date, params["print_edition_articles"], params["volume_number"], params["issue_number"])
         else:
             print("Could not generate Newsletter.")
 

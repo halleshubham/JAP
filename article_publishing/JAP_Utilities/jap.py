@@ -5,6 +5,8 @@ from pprint import pprint
 import unidecode
 from slugify import slugify
 import requests
+import re
+import requests
 
 
 def get_authors_list(summary_data):
@@ -285,6 +287,7 @@ def get_article_url(article_title):
                 }
     response = requests.get(article_url, headers=headers)
     if response.status_code != 200:
+        print(article_url)
         print("Could not get the url for the article: " +article_title)
         return False
     else:

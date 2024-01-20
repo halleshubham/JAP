@@ -52,7 +52,7 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
     article1 = docx.Document(docxFilePath)
     html = ''
     with open(docxFilePath, "rb") as docx_file:
-        result = mammoth.convert_to_html(docx_file)
+        result = mammoth.convert_to_html(docx_file, convert_image=mammoth.images.base64)
         article_content = result.value
         with open("file.html", "w", encoding="utf-8") as file:
             file.write(article_content)

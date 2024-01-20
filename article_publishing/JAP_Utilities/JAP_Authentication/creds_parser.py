@@ -6,10 +6,10 @@ def get_creds():
     if os.path.exists(creds_path):
         with open(creds_path) as creds_file:
             creds = json.load(creds_file)
-            if "resource_owner_key" not in creds.keys():
+            """if "resource_owner_key" not in creds.keys():
                  print("Access Token not found!! Please run the authorize.py first!")
                  return False
-            else:
-                return creds
+            else:"""
+            return creds
     else:
         print('Error : jap_config.json missing!')

@@ -5,7 +5,7 @@ import json
 import os
 from creds_parser import get_creds
 
-creds = get_creds
+creds = get_creds()
 
 urls={
         "request_token_url" : "https://janataweekly.org/oauth1/request",
