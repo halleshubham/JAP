@@ -7,7 +7,45 @@ from slugify import slugify
 import requests
 import re
 import requests
+from io import BytesIO
+import base64
+import re
 
+
+def extract_base64_inline_images(html):
+    base64_images = re.findall(r'<img[^>]+src="data:image/[^;]+;base64[^"]+"', html)
+    return base64_images
+
+def upload_inline_image_to_wordpress(image_data, image_filename, creds):
+    image_data = re.sub('^data:image/.+;base64,', '', image_data)
+    image_bytes = base64.b64decode(image_data)
+    protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/'
+    headers = { 
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
+                }
+    
+    data = {
+        'file': (image_filename, BytesIO(image_bytes))
+    }
+    oauth = OAuth1Session(creds['client_key'],
+                                    client_secret=creds['client_secret'],
+                                    resource_owner_key=creds['resource_owner_key'],
+                                    resource_owner_secret=creds['resource_owner_secret'])
+    r = oauth.post(protected_url,headers=headers,files=data)
+   
+    return r.json()
+
+def process_base64_inline_images(html, creds):
+    base64_images = extract_base64_inline_images(html)
+    for img_tag in base64_images:
+        base64_data = re.search(r'src="(data:image/[^;]+;base64[^"]+)"', img_tag).group(1)
+        # Generate a unique filename or use a static one if you prefer
+        image_filename = 'uploaded_image.png'
+        response = upload_inline_image_to_wordpress(base64_data, image_filename, creds)
+        image_url = response['source_url']
+        # Replace the base64 image in the HTML with the URL of the uploaded image
+        html = html.replace(base64_data, image_url)
+    return html
 
 def get_authors_list(summary_data):
     authors_list = []
@@ -294,6 +332,9 @@ def get_article_url(article_title):
         return (article_title, article_url)
 
 def get_article_urls(article_titles):
+    #results={}
+    #for title in article_titles:
+        #results = get_article_url(title)
     with Pool() as pool:
         results = pool.map(get_article_url, article_titles)
 
@@ -315,6 +356,5 @@ def get_article_data(article_title):
 
 def get_articles_data(article_titles):
     with Pool() as pool:
-        results = pool.map(get_article_data, article_titles)
-    
+       results = pool.map(get_article_data, article_titles)
     return results

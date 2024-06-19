@@ -1,16 +1,25 @@
+import base64
+import io
 from time import strftime
 from JAP_Utilities.JAP_Authentication.creds_parser import get_creds
 import os
-from JAP_Utilities.jap import upload_images,get_authors_list,add_authors,create_post,delete_images,delete_posts
+from JAP_Utilities.jap import upload_images,get_authors_list,add_authors,create_post,delete_images,delete_posts, process_base64_inline_images
 from JAP_Utilities.summary_parser import get_summary_data
 from JAP_Utilities.configs_parser import get_params
 from datetime import date, datetime
 import mammoth
+from mammoth import images
 import os
 import docx
 from bs4 import BeautifulSoup
 from multiprocessing import Pool, cpu_count
 from slugify import slugify
+from docx.shared import Pt
+from PIL import Image
+import re
+from docx.shared import Cm
+from docx.enum.table import WD_ALIGN_VERTICAL
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 def checkIfAnyElementIsToBeRemoved(tag,title,author):
     if (tag.text == '' and (tag.img == None)):
@@ -40,6 +49,100 @@ def getMatchingSoupElementWithParaText(para,soupElement):
             break
     return soupElement
 
+def extract_table_formatting(docx):
+    table_styles = []
+
+    for table in docx.tables:
+        table_style = []
+        for row in table.rows:
+            row_style = []
+            for cell in row.cells:
+                cell_style = {}
+                shading_elements = cell._element.xpath(".//w:shd")
+                if len(shading_elements) > 0:
+                    cell_shading = shading_elements[0]
+                    cell_fill = cell_shading.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}fill")
+                    if cell_fill:
+                        cell_style['background-color'] = f"#{cell_fill}"
+                
+                # Extract borders (top, bottom, left, right)
+                for side in ['top', 'bottom', 'left', 'right']:
+                    border_elements = cell._element.xpath(f".//w:tcBorders/w:{side}")
+                    if len(border_elements) > 0:
+                        border = border_elements[0]
+                        color = border.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}color")
+                        size = border.get("{http://schemas.openxmlformats.org/wordprocessingml/2006/main}sz")
+                        if color is not None and size is not None:
+                            cell_style[f'border-{side}'] = f"{int(size)/8}px solid #{color}"
+                
+                # Text alignment
+                if cell.vertical_alignment == WD_ALIGN_VERTICAL.CENTER:
+                    cell_style['vertical-align'] = 'middle'
+                elif cell.vertical_alignment == WD_ALIGN_VERTICAL.BOTTOM:
+                    cell_style['vertical-align'] = 'bottom'
+                else:
+                    cell_style['vertical-align'] = 'top'
+                
+                for paragraph in cell.paragraphs:
+                    if paragraph.alignment == WD_ALIGN_PARAGRAPH.CENTER:
+                        cell_style['text-align'] = 'center'
+                    elif paragraph.alignment == WD_ALIGN_PARAGRAPH.RIGHT:
+                        cell_style['text-align'] = 'right'
+                    else:
+                        cell_style['text-align'] = 'left'
+                
+                # Capture text formatting
+                text_elements = []
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        text_format = ''
+                        if run.bold:
+                            text_format += 'font-weight: bold;'
+                        if run.italic:
+                            text_format += 'font-style: italic;'
+                        if run.underline:
+                            text_format += 'text-decoration: underline;'
+                        if paragraph.alignment:
+                            align_map = {0: 'left', 1: 'center', 2: 'right', 3: 'justify'}
+                            text_format += f'text-align: {align_map.get(paragraph.alignment, "left")};'
+                        
+                        text_elements.append({
+                            'text': run.text,
+                            'style': text_format
+                        })
+                
+                cell_style['text_elements'] = text_elements
+                
+                row_style.append(cell_style)
+            table_style.append(row_style)
+        table_styles.append(table_style)
+        
+    return table_styles
+
+
+def extract_image_formatting(docx):
+    image_styles = []
+
+    for shape in docx.inline_shapes:
+        if shape.type == 3:  # Inline picture type
+            image_style = {}
+            if shape.width:
+                image_style['width'] = f"{Cm(shape.width.cm)}cm"
+            if shape.height:
+                image_style['height'] = f"{Cm(shape.height.cm)}cm"
+            
+            # Find the paragraph alignment
+            alignment = shape._inline.graphic.graphicData.pic.spPr.bodyPr.algn
+            if alignment == 'ctr':  # Center
+                image_style['alignment'] = 'center'
+            elif alignment == 'r':  # Right
+                image_style['alignment'] = 'right'
+            else:  # Left or None
+                image_style['alignment'] = 'left'
+            
+            image_styles.append(image_style)
+    return image_styles
+
 def convertDocxToHtml(docxFilePath,summaryOfArticle):
     title = summaryOfArticle["article_title"]
     title = title.lower()
@@ -50,9 +153,15 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
     author = author.replace(' ','')
 
     article1 = docx.Document(docxFilePath)
+    
+    table_styles = extract_table_formatting(article1)
+    
+    image_styles = extract_image_formatting(article1)
+                        
     html = ''
     with open(docxFilePath, "rb") as docx_file:
-        result = mammoth.convert_to_html(docx_file, convert_image=mammoth.images.base64)
+        #result = mammoth.convert_to_html(docx_file, convert_image=convert_image)
+        result = mammoth.convert_to_html(docx_file)
         article_content = result.value
         with open("file.html", "w", encoding="utf-8") as file:
             file.write(article_content)
@@ -65,15 +174,11 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
     countofH2 = 0
     cool = soup.contents[0]
     for para in article1.paragraphs:
-        if (para.text != '' and (para.text != ' ' and (para.text != '\n' and (para.text != '')))):
-
-            #cool = soup.find('p',text = para.text)
+        if para.text.strip():
+                  
             cool = getMatchingSoupElementWithParaText(para, cool)            
             if (type(cool) == type(None)):
                 cool = soup.find_all('p')[count - countofH2]
-            #if (cool.text ==''):
-            #    cool.decompose()
-            #    cool = soup.find_all('p')[count-countofH2]
             compareSoupString = str(cool.text)
             compareSoupString = compareSoupString.lower()
             compareSoupString = compareSoupString.replace(' ','')
@@ -90,42 +195,29 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
                 continue
 
             cool = checkIfAnyElementIsToBeRemoved(cool,title,author)
-            #if (count == 4):
-            #    print("wait")
-            """
-            #Commenting out code for now
+
             if ((cool.tr != None)):
-                print("Text is a table so checking so ignoring the element \n\n")
                 continue
 
             if ((cool.li != None) and (para.text in cool.text)):
-                print("Text is a bullet list so checking if ",para.text,"is present in ",cool.text,"\n\n")
                 continue
 
             if ('http' in cool.text):
-                print("Text contains http so checking if ",para.text,"is present in ",cool.text,"\n\n")
                 continue
 
             if (cool.img != None):
-                print("Image element found \n",para.text,"\n")
                 count+=1
-                #cool = soup.find_all('p')[count-countofH2]
                 if (cool.text == None):
                     cool = cool.nextSibling
 
             if (cool.text == para.text or (cool.text.strip() == para.text.strip())):
-                print("Text match with each other\n count will go to ",count,"+1",para.text,"\n\n")
                 count += 1
 
                 if (para.paragraph_format.left_indent != None or (len(para.text) - len(cool.text.strip()) > 2)):
-                    #print ("We have indentation for\n",para.text,"\n")
                     cool['style'] = "padding-left: 40px;"
 
                 if para.runs[0].font.size == Pt(14):
-                    
-                    print("Initial count of p tags is ",len(soup.find_all('p')),"\n")
                     cool.name = 'h2'
-                    print("Updated count of p tags is ",len(soup.find_all('p')),"\n\n")
                     countofH2 +=1
                 if para.runs[0].font.underline == True:
                     newTagUnderline = soup.new_tag("span",style="text-decoration: underline;")
@@ -136,13 +228,46 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
                     cool['class'] = "has-text-align-right"
             else:
                 print("Text DO NOT match with each other\n Para.text is ",para.text,"\nCool.text is",cool.text,"\n\n")
-            """
-    for imageElement in soup.find_all('img'):
-        imageElement['class'] = "aligncenter"
+    
+    img_idx = 0
+    for img in soup.find_all("img"):
+        if img_idx < len(image_styles):
+            img_style = image_styles[img_idx]
+            style_str = '; '.join([f"{k}: {v}" for k, v in img_style.items() if k != 'alignment'])
+            img['style'] = style_str
+            
+            if 'alignment' in img_style:
+                alignment = img_style['alignment']
+                img['class'] = img.get('class', []) + [f'align-{alignment}']
+            
+            img_idx += 1
+            
+    for table_idx, table in enumerate(soup.find_all("table")):
+        table['class'] = table.get('class', []) + ['table', 'table-bordered', 'table-striped']
+        if table_idx < len(table_styles):
+            table_style = table_styles[table_idx]
+            for row_idx, row in enumerate(table.find_all("tr")):
+                if row_idx < len(table_style):
+                    row_style = table_style[row_idx]
+                    for col_idx, cell in enumerate(row.find_all(["td", "th"])):
+                        if col_idx < len(row_style):
+                            cell_style = row_style[col_idx]
+                            style_str = '; '.join([f"{k}: {v}" for k, v in cell_style.items()])
+                            cell['style'] = style_str
+                            
+                            # Apply text formatting within the cell
+                            cell.clear()
+                            for text_elem in cell_style.get('text_elements', []):
+                                span = soup.new_tag('span')
+                                span.string = text_elem['text']
+                                span['style'] = text_elem['style']
+                                cell.append(span)
     return str(soup)
 
 if __name__ == '__main__':
-    print("Total CPUs being used: ", cpu_count())
+
+    print("Total CPUs being used: ", cpu_count()) 
+
     creds = get_creds()
     start_time = datetime.now();
     if creds:
@@ -154,32 +279,19 @@ if __name__ == '__main__':
         summaryfile = params['summaryfile']
         summary_data = get_summary_data(summaryfile)
     
-        # getting articles files
         articles_folder_path = params['articles_folder_path']
+   
         artilces_files = {}
         for article in os.listdir(articles_folder_path):
             article_number = article.split('-')[0]
             artilces_files[article_number] = article
-
 
         # Adding authors
         authors_list = get_authors_list(summary_data)
         authors_ids = add_authors(authors_list,creds)
         print('\n------------------------------------------------------------\n')
 
-
         if authors_ids:
-
-            for i in range(len(artilces_files)):
-                    try:
-                        artilce_path = articles_folder_path + artilces_files[str(int(i) + 1)]
-                        try:
-                            article_content = convertDocxToHtml(artilce_path, summary_data[i])
-
-                        except Exception as e:
-                            print('There is some issue with getting Html From Beautiful Soup')
-                    except Exception as e:
-                        print(e)
             # Uploading images
             images_folder_path = params['images_folder_path']
             image_dict = upload_images(images_folder_path,creds,len(authors_ids))
@@ -203,13 +315,10 @@ if __name__ == '__main__':
                     try:
                         artilce_path = articles_folder_path + artilces_files[str(int(i) + 1)]
                         try:
-                            article_content = convertDocxToHtml(artilce_path, summary_data[i])
-                            #article_content = result.value
-                            #with open(artilce_path, "rb") as docx_file:
-                            #    result = mammoth.convert_to_html(docx_file)
-                            #    article_content = result.value
+                            article_html = convertDocxToHtml(artilce_path, summary_data[i])
+                            article_content = process_base64_inline_images(article_html, creds)
                         except Exception as e:
-                            print('There is some issue with getting Html From Beautiful Soup')
+                            print('There is some issue with getting Html From Beautiful Soup: ')
 
                         total_articles = len(image_ids)
                         total_articles = len(image_ids)
@@ -290,4 +399,3 @@ if __name__ == '__main__':
                 delete_images(list(image_dict['image_ids'].values()),creds)
         else:
             print("Unable to create all the authors! Script stopped.")
-                
