@@ -16,22 +16,62 @@ def extract_base64_inline_images(html):
     base64_images = re.findall(r'<img[^>]+src="data:image/[^;]+;base64[^"]+"', html)
     return base64_images
 
+# Commented out OAuth version
+# def upload_inline_image_to_wordpress(image_data, image_filename, creds):
+#     image_data = re.sub('^data:image/.+;base64,', '', image_data)
+#     image_bytes = base64.b64decode(image_data)
+#     protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/'
+#     headers = { 
+#                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
+#                 }
+    
+#     data = {
+#         'file': (image_filename, BytesIO(image_bytes))
+#     }
+#     oauth = OAuth1Session(creds['client_key'],
+#                                     client_secret=creds['client_secret'],
+#                                     resource_owner_key=creds['resource_owner_key'],
+#                                     resource_owner_secret=creds['resource_owner_secret'])
+#     r = oauth.post(protected_url,headers=headers,files=data)
+   
+#     return r.json()
+
 def upload_inline_image_to_wordpress(image_data, image_filename, creds):
+    """Upload inline image using basic authentication"""
+    import base64 as b64
+    
+    # Check if basic auth credentials are available
+    if 'wp_username' not in creds or 'wp_password' not in creds:
+        print("Basic auth credentials (wp_username, wp_password) not found in config")
+        return False
+    
     image_data = re.sub('^data:image/.+;base64,', '', image_data)
     image_bytes = base64.b64decode(image_data)
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/'
-    headers = { 
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
-                }
     
-    data = {
+    # Create basic auth header
+    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+    encoded_credentials = b64.b64encode(credentials.encode()).decode()
+    
+    headers = { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Authorization': f'Basic {encoded_credentials}'
+    }
+    
+    files = {
         'file': (image_filename, BytesIO(image_bytes))
     }
-    oauth = OAuth1Session(creds['client_key'],
-                                    client_secret=creds['client_secret'],
-                                    resource_owner_key=creds['resource_owner_key'],
-                                    resource_owner_secret=creds['resource_owner_secret'])
-    r = oauth.post(protected_url,headers=headers,files=data)
+    
+    r = requests.post(protected_url, headers=headers, files=files)
+    
+    if r.status_code == 401:
+        print("401 Unauthorized error uploading inline image")
+        print("Please check your WordPress username and password")
+        return False
+    
+    if r.status_code != 201:
+        print(f"Error uploading inline image: {r.status_code} - {r.text}")
+        return False
    
     return r.json()
 
@@ -55,59 +95,155 @@ def get_authors_list(summary_data):
 
 
 
-def get_author_by_slug(author,creds):
+# Commented out OAuth version due to 401 errors
+# def get_author_by_slug(author,creds):
+#     username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
+#     username = unidecode.unidecode(username_pre)[:49]
+#     protected_url = 'https://janataweekly.org/wp-json/wp/v2/users?slug=' + username
+
+#     headers = { 
+#                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
+#                 }
+#     oauth = OAuth1Session(creds['client_key'],
+#                             client_secret=creds['client_secret'],
+#                             resource_owner_key=creds['resource_owner_key'], 
+#                             resource_owner_secret=creds['resource_owner_secret'])
+#     r = oauth.get(protected_url,headers=headers)
+#     if len(r.json()) == 0:
+#         return False
+#     else :
+#         author = r.json()[0]['id']
+#         return author
+
+def get_author_by_slug(author, creds):
+    """Get author by slug using basic authentication"""
+    import base64
+    
+    # Check if basic auth credentials are available
+    if 'wp_username' not in creds or 'wp_password' not in creds:
+        print("Basic auth credentials (wp_username, wp_password) not found in config")
+        return False
+    
     username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
     username = unidecode.unidecode(username_pre)[:49]
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/users?slug=' + username
 
+    # Create basic auth header
+    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+    
     headers = { 
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
-                }
-    oauth = OAuth1Session(creds['client_key'],
-                            client_secret=creds['client_secret'],
-                            resource_owner_key=creds['resource_owner_key'], 
-                            resource_owner_secret=creds['resource_owner_secret'])
-    r = oauth.get(protected_url,headers=headers)
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Authorization': f'Basic {encoded_credentials}'
+    }
+    
+    r = requests.get(protected_url, headers=headers)
+    
+    if r.status_code == 401:
+        print(f"401 Unauthorized error in get_author_by_slug for author: {author}")
+        print("Please check your WordPress username and password")
+        return False
+    
+    if r.status_code != 200:
+        print(f"HTTP Error {r.status_code} in get_author_by_slug for author: {author}")
+        print(f"Response: {r.text}")
+        return False
+        
     if len(r.json()) == 0:
         return False
-    else :
-        author = r.json()[0]['id']
-        return author
+    else:
+        author_id = r.json()[0]['id']
+        return author_id
 
 
 
-def get_author_by_email(author,creds):
+# Commented out OAuth version due to 401 errors
+# def get_author_by_email(author,creds):
+#     username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
+#     username = unidecode.unidecode(username_pre)[:49]
+#     protected_url = 'https://janataweekly.org/wp-json/wp/v2/users?search=' + username + '@test.com'
+#     headers = { 
+#                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
+#                 }
+#     oauth = OAuth1Session(creds['client_key'],
+#                             client_secret=creds['client_secret'],
+#                             resource_owner_key=creds['resource_owner_key'], 
+#                             resource_owner_secret=creds['resource_owner_secret'])
+
+      
+#     r = oauth.get(protected_url,headers=headers)
+#     if len(r.json()) == 0:
+#         return False
+#     else :
+#         author = r.json()[0]['id']
+#         return author
+
+def get_author_by_email(author, creds):
+    """Get author by email using basic authentication"""
+    import base64
+    
+    # Check if basic auth credentials are available
+    if 'wp_username' not in creds or 'wp_password' not in creds:
+        print("Basic auth credentials (wp_username, wp_password) not found in config")
+        return False
+    
     username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
     username = unidecode.unidecode(username_pre)[:49]
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/users?search=' + username + '@test.com'
+    
+    # Create basic auth header
+    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+    
     headers = { 
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
-                }
-    oauth = OAuth1Session(creds['client_key'],
-                            client_secret=creds['client_secret'],
-                            resource_owner_key=creds['resource_owner_key'], 
-                            resource_owner_secret=creds['resource_owner_secret'])
-
-      
-    r = oauth.get(protected_url,headers=headers)
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Authorization': f'Basic {encoded_credentials}'
+    }
+    
+    r = requests.get(protected_url, headers=headers)
+    
+    if r.status_code == 401:
+        print(f"401 Unauthorized error in get_author_by_email for author: {author}")
+        print("Please check your WordPress username and password")
+        return False
+    
+    if r.status_code != 200:
+        print(f"HTTP Error {r.status_code} in get_author_by_email for author: {author}")
+        print(f"Response: {r.text}")
+        return False
+        
     if len(r.json()) == 0:
         return False
-    else :
-        author = r.json()[0]['id']
-        return author
+    else:
+        author_id = r.json()[0]['id']
+        return author_id
 
 
 
 def create_author(args):
     (author,creds) = args
 
+    # Check if basic auth credentials are available
+    if 'wp_username' not in creds or 'wp_password' not in creds:
+        print("Basic auth credentials (wp_username, wp_password) not found in config")
+        return False
+
     author_id = get_author_by_slug(author,creds)
     if not author_id:
+        import base64
+        
         protected_url = 'https://janataweekly.org/wp-json/wp/v2/users'
+        
+        # Create basic auth header
+        credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+        
         headers = { 
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-                     
-                    }
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'Authorization': f'Basic {encoded_credentials}',
+            'Content-Type': 'application/json'
+        }
+        
         username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
         username = unidecode.unidecode(username_pre)[:49]
 
@@ -119,29 +255,36 @@ def create_author(args):
                 'roles':'author',
                 'password':'testpass@1234'
                 }
-        oauth = OAuth1Session(creds['client_key'],
-                                client_secret=creds['client_secret'],
-                                resource_owner_key=creds['resource_owner_key'],
-                                resource_owner_secret=creds['resource_owner_secret'])
-        r = oauth.post(protected_url,headers=headers,data=data)
+        
+        r = requests.post(protected_url, headers=headers, json=data)
+        
         if r.status_code == 201:
             print('Author ' + author + ' added.')
             return r.json()['id']
             
         else:
-            error = r.json()
-            if error['code'] == 'existing_user_email' or error['code'] == 'existing_user_login':
-                existing_author_id = get_author_by_email(author,creds)
-                if existing_author_id:
-                    update_status = update_author(author,existing_author_id,creds)
-                    if update_status:
-                        return True
-                    else: 
-                        print('Author ' + author + ' could not be added.')
-                        return False
-            else:
-                pprint(error)
-                print('Author ' + author + ' could not be added.')
+            if r.status_code == 401:
+                print(f"401 Unauthorized error creating author: {author}")
+                print("Please check your WordPress username and password")
+                return False
+                
+            try:
+                error = r.json()
+                if error['code'] == 'existing_user_email' or error['code'] == 'existing_user_login':
+                    existing_author_id = get_author_by_email(author,creds)
+                    if existing_author_id:
+                        update_status = update_author(author,existing_author_id,creds)
+                        if update_status:
+                            return update_status
+                        else: 
+                            print('Author ' + author + ' could not be added.')
+                            return False
+                else:
+                    pprint(error)
+                    print('Author ' + author + ' could not be added.')
+                    return False
+            except:
+                print(f"Error creating author {author}: {r.status_code} - {r.text}")
                 return False
     else:
         print('Author ' + author + ' already present.')
@@ -150,27 +293,47 @@ def create_author(args):
 
 
 def update_author(author,existing_author_id,creds):
+    """Update author using basic authentication"""
+    import base64
+    
+    # Check if basic auth credentials are available
+    if 'wp_username' not in creds or 'wp_password' not in creds:
+        print("Basic auth credentials (wp_username, wp_password) not found in config")
+        return False
+    
     username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
     username = unidecode.unidecode(username_pre)[:49]
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/users/' + str(existing_author_id)
+    
+    # Create basic auth header
+    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+    
     headers = { 
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
-                     
-                }
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Authorization': f'Basic {encoded_credentials}',
+        'Content-Type': 'application/json'
+    }
+    
     data = {
             'first_name' : author ,
             'slug' : username
-
             }
-    oauth = OAuth1Session(creds['client_key'],
-                            client_secret=creds['client_secret'],
-                            resource_owner_key=creds['resource_owner_key'],
-                            resource_owner_secret=creds['resource_owner_secret'])
-    r = oauth.post(protected_url,headers=headers,data=data)
+    
+    r = requests.post(protected_url, headers=headers, json=data)
+    
     if r.status_code == 200:
         return r.json()['id']
     else:
-        print(r.json())
+        if r.status_code == 401:
+            print(f"401 Unauthorized error updating author: {author}")
+            print("Please check your WordPress username and password")
+        else:
+            print(f"Error updating author {author}: {r.status_code}")
+            try:
+                print(r.json())
+            except:
+                print(r.text)
         return False
 
 
@@ -191,30 +354,74 @@ def add_authors(authors_list,creds):
             return False
     return author_ids
 
+# Commented out OAuth version
+# def upload_image(args):
+#     (image_file, folder_path, creds) = args
+
+#     protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/'
+#     headers = { 
+#                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
+#                 }
+#     data = {
+#                'file': open(folder_path + image_file,'rb')
+#            }
+#     oauth = OAuth1Session(creds['client_key'],
+#                                     client_secret=creds['client_secret'],
+#                                     resource_owner_key=creds['resource_owner_key'],
+#                                     resource_owner_secret=creds['resource_owner_secret'])
+#     r = oauth.post(protected_url,headers=headers,files=data)
+#     if r.status_code != 201:
+#         print('Image "' + image_file + '" could not be uploaded')
+#         print(r.content)
+#         return {'status': False, 'message' : 'Error uploading image'}
+
+#     image_number = image_file.split('.')[0]
+#     image_id= r.json()['id']
+#     print('Image "' + image_file + '" uploaded successfully') 
+#     return {'status': True, 'image_number': image_number, 'image_id': image_id  }
+
 def upload_image(args):
+    """Upload image using basic authentication"""
+    import base64
+    
     (image_file, folder_path, creds) = args
 
+    # Check if basic auth credentials are available
+    if 'wp_username' not in creds or 'wp_password' not in creds:
+        print("Basic auth credentials (wp_username, wp_password) not found in config")
+        return {'status': False, 'message': 'Basic auth credentials missing'}
+
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/'
+    
+    # Create basic auth header
+    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+    
     headers = { 
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
-                }
-    data = {
-               'file': open(folder_path + image_file,'rb')
-           }
-    oauth = OAuth1Session(creds['client_key'],
-                                    client_secret=creds['client_secret'],
-                                    resource_owner_key=creds['resource_owner_key'],
-                                    resource_owner_secret=creds['resource_owner_secret'])
-    r = oauth.post(protected_url,headers=headers,files=data)
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Authorization': f'Basic {encoded_credentials}'
+    }
+    
+    files = {
+        'file': open(folder_path + image_file,'rb')
+    }
+    
+    r = requests.post(protected_url, headers=headers, files=files)
+    
+    if r.status_code == 401:
+        print('401 Unauthorized error uploading image "' + image_file + '"')
+        print("Please check your WordPress username and password")
+        return {'status': False, 'message': 'Unauthorized'}
+    
     if r.status_code != 201:
         print('Image "' + image_file + '" could not be uploaded')
-        print(r.content)
-        return {'status': False, 'message' : 'Error uploading image'}
+        print(f"Status: {r.status_code}, Response: {r.text}")
+        return {'status': False, 'message': 'Error uploading image'}
 
     image_number = image_file.split('.')[0]
-    image_id= r.json()['id']
+    image_id = r.json()['id']
     print('Image "' + image_file + '" uploaded successfully') 
-    return {'status': True, 'image_number': image_number, 'image_id': image_id  }
+    return {'status': True, 'image_number': image_number, 'image_id': image_id}
 
 
 def upload_images(folder_path,creds,author_ids_list_length):
@@ -239,20 +446,51 @@ def upload_images(folder_path,creds,author_ids_list_length):
     else:
         return {'status':False,'image_ids':{},'message':'Number of images and articles does not match!'}
 
-def delete_image(args):
-    (image_id,creds) = args
-    headers = { 
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+# Commented out OAuth version
+# def delete_image(args):
+#     (image_id,creds) = args
+#     headers = { 
+#                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                      
-                }
-    oauth = OAuth1Session(creds['client_key'],
-                                client_secret=creds['client_secret'],
-                                resource_owner_key=creds['resource_owner_key'],
-                                resource_owner_secret=creds['resource_owner_secret'])
+#                 }
+#     oauth = OAuth1Session(creds['client_key'],
+#                                 client_secret=creds['client_secret'],
+#                                 resource_owner_key=creds['resource_owner_key'],
+#                                 resource_owner_secret=creds['resource_owner_secret'])
+#     protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/' + str(image_id) + '?force=true'
+#     r = oauth.delete(protected_url,headers=headers)
+#     if r.status_code != 200:
+#         print(r.status_code)
+#         print(r.text)
+
+def delete_image(args):
+    """Delete image using basic authentication"""
+    import base64
+    
+    (image_id, creds) = args
+    
+    # Check if basic auth credentials are available
+    if 'wp_username' not in creds or 'wp_password' not in creds:
+        print("Basic auth credentials (wp_username, wp_password) not found in config")
+        return
+    
+    # Create basic auth header
+    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+    
+    headers = { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Authorization': f'Basic {encoded_credentials}'
+    }
+    
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/' + str(image_id) + '?force=true'
-    r = oauth.delete(protected_url,headers=headers)
-    if r.status_code != 200:
-        print(r.status_code)
+    r = requests.delete(protected_url, headers=headers)
+    
+    if r.status_code == 401:
+        print("401 Unauthorized error deleting image")
+        print("Please check your WordPress username and password")
+    elif r.status_code != 200:
+        print(f"Error deleting image {image_id}: {r.status_code}")
         print(r.text)
 
 def delete_images(id_list,creds):
@@ -264,47 +502,123 @@ def delete_images(id_list,creds):
     print("Deleted the images uploaded in this session!")
 
 
+# Commented out OAuth version
+# def create_post(args):
+#     (data,creds) = args
+#     try:
+#         protected_url = 'https://janataweekly.org/wp-json/wp/v2/posts/'
+#         headers = { 
+#                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
+#                 }
+
+#         oauth = OAuth1Session(creds['client_key'],
+#                                     client_secret=creds['client_secret'],
+#                                     resource_owner_key=creds['resource_owner_key'],
+#                                     resource_owner_secret=creds['resource_owner_secret'])
+
+#         r = oauth.post(protected_url,headers=headers,data=data)
+#         if r.status_code != 201:
+#             print(r.text)
+#             print("Post could not be created for article: ", data['title'])
+#             return {'status': False, 'article_title': data['title']}
+#         else:
+#             print("Post created for article: ", data['title'])
+#             article_id = r.json()['id']
+#             return {'status': True, 'article_title': data['title'], 'article_id':article_id}
+#     except Exception as e:
+#         print(e)
+#         print("Could not create the draft for the article ", data['title'])
+#         return {'status': False, 'article_title': data['title']}
+
 def create_post(args):
-    (data,creds) = args
+    """Create post using basic authentication"""
+    import base64
+    
+    (data, creds) = args
+    
+    # Check if basic auth credentials are available
+    if 'wp_username' not in creds or 'wp_password' not in creds:
+        print("Basic auth credentials (wp_username, wp_password) not found in config")
+        return {'status': False, 'article_title': data['title']}
+    
     try:
         protected_url = 'https://janataweekly.org/wp-json/wp/v2/posts/'
+        
+        # Create basic auth header
+        credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+        encoded_credentials = base64.b64encode(credentials.encode()).decode()
+        
         headers = { 
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' 
-                }
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+            'Authorization': f'Basic {encoded_credentials}',
+            'Content-Type': 'application/json'
+        }
 
-        oauth = OAuth1Session(creds['client_key'],
-                                    client_secret=creds['client_secret'],
-                                    resource_owner_key=creds['resource_owner_key'],
-                                    resource_owner_secret=creds['resource_owner_secret'])
-
-        r = oauth.post(protected_url,headers=headers,data=data)
+        r = requests.post(protected_url, headers=headers, json=data)
+        
+        if r.status_code == 401:
+            print("401 Unauthorized error creating post for article:", data['title'])
+            print("Please check your WordPress username and password")
+            return {'status': False, 'article_title': data['title']}
+        
         if r.status_code != 201:
+            print(f"Error {r.status_code} creating post for article: {data['title']}")
             print(r.text)
-            print("Post could not be created for article: ", data['title'])
             return {'status': False, 'article_title': data['title']}
         else:
             print("Post created for article: ", data['title'])
             article_id = r.json()['id']
-            return {'status': True, 'article_title': data['title'], 'article_id':article_id}
+            return {'status': True, 'article_title': data['title'], 'article_id': article_id}
     except Exception as e:
         print(e)
         print("Could not create the draft for the article ", data['title'])
         return {'status': False, 'article_title': data['title']}
 
-def delete_post(args):
-    (article_id,creds) = args
-    headers = { 
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+# Commented out OAuth version
+# def delete_post(args):
+#     (article_id,creds) = args
+#     headers = { 
+#                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
                      
-                }
-    oauth = OAuth1Session(creds['client_key'],
-                                client_secret=creds['client_secret'],
-                                resource_owner_key=creds['resource_owner_key'],
-                                resource_owner_secret=creds['resource_owner_secret'])
+#                 }
+#     oauth = OAuth1Session(creds['client_key'],
+#                                 client_secret=creds['client_secret'],
+#                                 resource_owner_key=creds['resource_owner_key'],
+#                                 resource_owner_secret=creds['resource_owner_secret'])
+#     protected_url = 'https://janataweekly.org/wp-json/wp/v2/posts/' + str(article_id) + '?force=true'
+#     r = oauth.delete(protected_url,headers=headers)
+#     if r.status_code != 200:
+#         print(r.status_code)
+#         print(r.text)
+
+def delete_post(args):
+    """Delete post using basic authentication"""
+    import base64
+    
+    (article_id, creds) = args
+    
+    # Check if basic auth credentials are available
+    if 'wp_username' not in creds or 'wp_password' not in creds:
+        print("Basic auth credentials (wp_username, wp_password) not found in config")
+        return
+    
+    # Create basic auth header
+    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+    encoded_credentials = base64.b64encode(credentials.encode()).decode()
+    
+    headers = { 
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Authorization': f'Basic {encoded_credentials}'
+    }
+    
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/posts/' + str(article_id) + '?force=true'
-    r = oauth.delete(protected_url,headers=headers)
-    if r.status_code != 200:
-        print(r.status_code)
+    r = requests.delete(protected_url, headers=headers)
+    
+    if r.status_code == 401:
+        print("401 Unauthorized error deleting post")
+        print("Please check your WordPress username and password")
+    elif r.status_code != 200:
+        print(f"Error deleting post {article_id}: {r.status_code}")
         print(r.text)
 
 def delete_posts(id_list,creds):

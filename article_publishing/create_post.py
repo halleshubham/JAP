@@ -349,7 +349,7 @@ if __name__ == '__main__':
                                 'excerpt' : article_excerpt,
                                 'featured_media':article_image_id,
                                 'author': article_author_id,
-                                'date': article_date,
+                                'date': datetime.strftime(article_date,'%Y-%m-%dT%H:%M:%S'),
                                 'categories' : categories
                             }    
                         total_publish_payload.append((data, creds))
