@@ -18,7 +18,7 @@ def generate_newsletter(summary, publish_date, print_edition_articles, volume_nu
     html_section_three_print_articles = ''
     if print_length > 0:
         html_section_two_print_cover = generate_cover_article(print_data[0], "Print Issue")
-        html_section_two_print_cover += appeal_join_janatweekly + contribute_appeal
+        html_section_two_print_cover += appeal_join_janatweekly 
         html_section_three_print_articles = generate_articles(print_data[1:], print_length-1)
     
     html_section_four_blog_cover = ''
@@ -27,7 +27,7 @@ def generate_newsletter(summary, publish_date, print_edition_articles, volume_nu
     if blog_length > 0: 
         html_section_four_blog_cover = generate_cover_article(blog_data[0], "Blog")
         if print_length == 0:
-            html_section_four_blog_cover += appeal_join_janatweekly + contribute_appeal
+            html_section_four_blog_cover += appeal_join_janatweekly 
         html_section_five_blog_articles = generate_articles(blog_data[1:], blog_length-1)
 
     html_section_six_end = footer_janata + end_of_html
@@ -425,8 +425,7 @@ footer_janata = '''
                                                                     />
                                                                 </a>
                                                             </div>
-                                                            <h5>Subscribe to Janata Weekly Hard Copy
-                                                                <br/> Annual Rs. 260 | Three Years : Rs. 750
+                                                            <h5>
                                                                 <br/> Contact: Guddi +91 7738082170
                                                                 <a href="https://janataweekly.org/subscribe"> <br/> <b> Click here to <font style="{color:red;}">Receive Janata Weekly on WhatsApp & Email!</font> </a></h5>
                                                             <hr>
