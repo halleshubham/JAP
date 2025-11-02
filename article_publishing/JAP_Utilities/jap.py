@@ -380,6 +380,70 @@ def add_authors(authors_list,creds):
 #     print('Image "' + image_file + '" uploaded successfully') 
 #     return {'status': True, 'image_number': image_number, 'image_id': image_id  }
 
+
+# def convert_image_to_jpg(image_path):
+#     from PIL import Image
+#     img = Image.open(image_path)
+#     # Convert to RGB for JPEG
+#     if img.mode != "RGB":
+#         img = img.convert("RGB")
+#     jpg_image_path = os.path.splitext(image_path)[0] + '.jpg'
+#     img.save(jpg_image_path, 'JPEG', quality=95)
+#     os.remove(image_path)
+#     return jpg_image_path
+
+def convert_and_optimize_image(image_path, max_size=819200):
+    from PIL import Image
+    import io
+    # Always convert PNG to JPEG for best size reduction
+    img = Image.open(image_path)
+    if img.mode != "RGB":
+        img = img.convert("RGB")
+    # Prepare output JPEG path
+    jpeg_path = os.path.splitext(image_path)[0] + ".jpg"
+    quality = 95
+    min_quality = 20
+    resize_factor = 0.9
+    min_size = (200, 200)  # Don't shrink below this
+    # Start with original size
+    width, height = img.size
+    while True:
+        # Save to buffer to check size
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=quality, optimize=True)
+        size = buf.tell()
+        if size <= max_size:
+            # Write to disk
+            with open(jpeg_path, "wb") as f:
+                f.write(buf.getvalue())
+            # Remove original PNG
+            try:
+                os.remove(image_path)
+            except Exception:
+                pass
+            return jpeg_path
+        # Reduce quality if possible
+        if quality > min_quality:
+            quality -= 10
+            continue
+        # If quality is low, try resizing
+        if width > min_size[0] and height > min_size[1]:
+            width = int(width * resize_factor)
+            height = int(height * resize_factor)
+            img = img.resize((width, height), Image.LANCZOS)
+            # Reset quality for new size
+            quality = 95
+            continue
+        # If can't reduce further, save as is and break
+        with open(jpeg_path, "wb") as f:
+            f.write(buf.getvalue())
+        try:
+            os.remove(image_path)
+        except Exception:
+            pass
+        return jpeg_path
+
+
 def upload_image(args):
     """Upload image using basic authentication"""
     import base64
@@ -401,9 +465,11 @@ def upload_image(args):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'Authorization': f'Basic {encoded_credentials}'
     }
+
+    optimized_image_path = convert_and_optimize_image(folder_path + image_file)
     
     files = {
-        'file': open(folder_path + image_file,'rb')
+        'file': open(optimized_image_path, 'rb')
     }
     
     r = requests.post(protected_url, headers=headers, files=files)
