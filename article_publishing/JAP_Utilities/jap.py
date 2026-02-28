@@ -1,3 +1,5 @@
+from asyncio import sleep
+import time
 from requests_oauthlib import OAuth1Session
 from multiprocessing import Pool
 import os
@@ -82,6 +84,9 @@ def process_base64_inline_images(html, creds):
         # Generate a unique filename or use a static one if you prefer
         image_filename = 'uploaded_image.png'
         response = upload_inline_image_to_wordpress(base64_data, image_filename, creds)
+        if not response:
+            print(f"Failed to upload inline image '{image_filename}', skipping replacement.")
+            continue
         image_url = response['source_url']
         # Replace the base64 image in the HTML with the URL of the uploaded image
         html = html.replace(base64_data, image_url)
@@ -418,7 +423,8 @@ def convert_and_optimize_image(image_path, max_size=819200):
                 f.write(buf.getvalue())
             # Remove original PNG
             try:
-                os.remove(image_path)
+                if image_path != jpeg_path:
+                    os.remove(image_path)
             except Exception:
                 pass
             return jpeg_path
@@ -448,7 +454,7 @@ def upload_image(args):
     """Upload image using basic authentication"""
     import base64
     
-    (image_file, folder_path, creds) = args
+    (optimized_image_path, creds) = args
 
     # Check if basic auth credentials are available
     if 'wp_username' not in creds or 'wp_password' not in creds:
@@ -465,8 +471,6 @@ def upload_image(args):
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'Authorization': f'Basic {encoded_credentials}'
     }
-
-    optimized_image_path = convert_and_optimize_image(folder_path + image_file)
     
     files = {
         'file': open(optimized_image_path, 'rb')
@@ -475,18 +479,18 @@ def upload_image(args):
     r = requests.post(protected_url, headers=headers, files=files)
     
     if r.status_code == 401:
-        print('401 Unauthorized error uploading image "' + image_file + '"')
+        print('401 Unauthorized error uploading image "' + optimized_image_path + '"')
         print("Please check your WordPress username and password")
         return {'status': False, 'message': 'Unauthorized'}
     
     if r.status_code != 201:
-        print('Image "' + image_file + '" could not be uploaded')
+        print('Image "' + optimized_image_path + '" could not be uploaded')
         print(f"Status: {r.status_code}, Response: {r.text}")
         return {'status': False, 'message': 'Error uploading image'}
-
-    image_number = image_file.split('.')[0]
+    image_name = os.path.basename(optimized_image_path)
+    image_number = image_name.split('.')[0]
     image_id = r.json()['id']
-    print('Image "' + image_file + '" uploaded successfully') 
+    print('Image "' + image_name + '" uploaded successfully') 
     return {'status': True, 'image_number': image_number, 'image_id': image_id}
 
 
@@ -495,7 +499,9 @@ def upload_images(folder_path,creds,author_ids_list_length):
         image_ids = {}
         args=[]
         for image_file in os.listdir(folder_path):
-            args.append((image_file, folder_path, creds))
+            optimized_image_path = convert_and_optimize_image(folder_path + image_file)
+            time.sleep(2)  # To avoid overwhelming the server
+            args.append((optimized_image_path, creds))
         
         with Pool() as pool:
             results = pool.map(upload_image, args)

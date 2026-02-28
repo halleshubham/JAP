@@ -1,5 +1,6 @@
 import base64
 import io
+import traceback
 from time import strftime
 from JAP_Utilities.JAP_Authentication.creds_parser import get_creds
 import os
@@ -21,30 +22,69 @@ from docx.shared import Cm
 from docx.enum.table import WD_ALIGN_VERTICAL
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
-def checkIfAnyElementIsToBeRemoved(tag,title,author):
-    if (tag.text == '' and (tag.img == None)):
+def safe_alignment(para):
+    """Safely get paragraph alignment, handling 'end'/'start' values that python-docx doesn't support."""
+    try:
+        return para.alignment
+    except Exception:
+        # Fallback: read the raw XML jc val attribute
+        pPr = para._p.pPr
+        if pPr is not None:
+            jc = pPr.find('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}jc')
+            if jc is not None:
+                val = jc.get('{http://schemas.openxmlformats.org/wordprocessingml/2006/main}val')
+                # Map raw OOXML values to python-docx alignment int equivalents
+                mapping = {'start': 0, 'left': 0, 'center': 1, 'right': 2, 'end': 2, 'both': 3, 'justify': 3}
+                return mapping.get(val, None)
+        return None
+
+def get_full_para_text(para):
+    """Get full paragraph text including hyperlink text.
+    
+    python-docx's para.text only returns text from direct child runs,
+    missing text inside <w:hyperlink> elements. This function extracts
+    all text from the paragraph XML including hyperlinks.
+    """
+    ns = '{http://schemas.openxmlformats.org/wordprocessingml/2006/main}'
+    texts = []
+    for child in para._p:
+        tag = child.tag
+        if tag == f'{ns}r':  # Regular run
+            t = child.find(f'{ns}t')
+            if t is not None and t.text:
+                texts.append(t.text)
+        elif tag == f'{ns}hyperlink':  # Hyperlink containing runs
+            for run in child.findall(f'{ns}r'):
+                t = run.find(f'{ns}t')
+                if t is not None and t.text:
+                    texts.append(t.text)
+    return ''.join(texts)
+
+def checkIfAnyElementIsToBeRemoved(tag, title, author):
+    while tag is not None and tag.text == '' and tag.img is None:
         nextTag = tag.find_next_sibling('p')
         tag.decompose()
-        tag = checkIfAnyElementIsToBeRemoved(nextTag,title,author)
+        tag = nextTag
     return tag
 
-def getMatchingSoupElementWithParaText(para,soupElement):
-
-    while (para.text.strip() != soupElement.text.strip()):
+def getMatchingSoupElementWithParaText(full_para_text, soupElement):
+    while (full_para_text.strip() != soupElement.text.strip()):
         if (soupElement.li != None):
-            while (para.text not in soupElement.text):
+            while (full_para_text not in soupElement.text):
                 soupElement = soupElement.next_sibling
             return soupElement
 
         if ('http' in soupElement.text):
             try:
                 linkText = soupElement.text.split(' http')[0]
-                if (linkText in para.text):
+                if (linkText in full_para_text):
                     break
             except:
-                print("soup Element doesn't contain http element not in para.text:",para.text)
+                print("soup Element doesn't contain http element not in para.text:",full_para_text)
 
         soupElement = soupElement.next_sibling
+        if soupElement is None:
+            break
         if(soupElement.tr != None):
             break
     return soupElement
@@ -84,9 +124,10 @@ def extract_table_formatting(docx):
                     cell_style['vertical-align'] = 'top'
                 
                 for paragraph in cell.paragraphs:
-                    if paragraph.alignment == WD_ALIGN_PARAGRAPH.CENTER:
+                    p_align = safe_alignment(paragraph)
+                    if p_align == WD_ALIGN_PARAGRAPH.CENTER or p_align == 1:
                         cell_style['text-align'] = 'center'
-                    elif paragraph.alignment == WD_ALIGN_PARAGRAPH.RIGHT:
+                    elif p_align == WD_ALIGN_PARAGRAPH.RIGHT or p_align == 2:
                         cell_style['text-align'] = 'right'
                     else:
                         cell_style['text-align'] = 'left'
@@ -102,9 +143,10 @@ def extract_table_formatting(docx):
                             text_format += 'font-style: italic;'
                         if run.underline:
                             text_format += 'text-decoration: underline;'
-                        if paragraph.alignment:
+                        p_align = safe_alignment(paragraph)
+                        if p_align:
                             align_map = {0: 'left', 1: 'center', 2: 'right', 3: 'justify'}
-                            text_format += f'text-align: {align_map.get(paragraph.alignment, "left")};'
+                            text_format += f'text-align: {align_map.get(p_align, "left")};'
                         
                         text_elements.append({
                             'text': run.text,
@@ -120,27 +162,38 @@ def extract_table_formatting(docx):
     return table_styles
 
 
-def extract_image_formatting(docx):
+def extract_image_formatting(docx_doc):
     image_styles = []
+    # Build a map from XML element -> Paragraph object once for O(1) lookups
+    para_map = {para._p: para for para in docx_doc.paragraphs}
 
-    for shape in docx.inline_shapes:
+    for shape in docx_doc.inline_shapes:
         if shape.type == 3:  # Inline picture type
             image_style = {}
             if shape.width:
-                image_style['width'] = f"{Cm(shape.width.cm)}cm"
+                image_style['width'] = f"{shape.width.cm:.2f}cm"
             if shape.height:
-                image_style['height'] = f"{Cm(shape.height.cm)}cm"
+                image_style['height'] = f"{shape.height.cm:.2f}cm"
             
-            # Find the paragraph alignment
-            alignment = shape._inline.graphic.graphicData.pic.spPr.bodyPr.algn
-            if alignment == 'ctr':  # Center
-                image_style['alignment'] = 'center'
-            elif alignment == 'r':  # Right
-                image_style['alignment'] = 'right'
-            else:  # Left or None
-                image_style['alignment'] = 'left'
+            # Find the parent <w:p> element, then use the matching Paragraph object
+            # so that safe_alignment() resolves style-inherited alignment too.
+            alignment = 'left'  # default
+            try:
+                parent = shape._inline.getparent()
+                while parent is not None and not parent.tag.endswith('}p'):
+                    parent = parent.getparent()
+                if parent is not None:
+                    para = para_map.get(parent)
+                    if para is not None:
+                        p_align = safe_alignment(para)
+                        align_map = {0: 'left', 1: 'center', 2: 'right', 3: 'justify'}
+                        alignment = align_map.get(p_align, 'left')
+            except Exception:
+                pass
             
+            image_style['alignment'] = alignment
             image_styles.append(image_style)
+  
     return image_styles
 
 def convertDocxToHtml(docxFilePath,summaryOfArticle):
@@ -173,12 +226,14 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
     count = 0
     countofH2 = 0
     cool = soup.contents[0]
+    all_soup_ps = soup.find_all('p')
     for para in article1.paragraphs:
-        if para.text.strip():
+        full_para_text = get_full_para_text(para)
+        if full_para_text.strip():
                   
-            cool = getMatchingSoupElementWithParaText(para, cool)            
+            cool = getMatchingSoupElementWithParaText(full_para_text, cool)            
             if (type(cool) == type(None)):
-                cool = soup.find_all('p')[count - countofH2]
+                cool = all_soup_ps[count - countofH2]
             compareSoupString = str(cool.text)
             compareSoupString = compareSoupString.lower()
             compareSoupString = compareSoupString.replace(' ','')
@@ -199,10 +254,12 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
             if ((cool.tr != None)):
                 continue
 
-            if ((cool.li != None) and (para.text in cool.text)):
+            if ((cool.li != None) and (full_para_text in cool.text)):
                 continue
 
             if ('http' in cool.text):
+                cool = cool.nextSibling
+                count += 1
                 continue
 
             if (cool.img != None):
@@ -210,35 +267,55 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
                 if (cool.text == None):
                     cool = cool.nextSibling
 
-            if (cool.text == para.text or (cool.text.strip() == para.text.strip())):
+            if (cool.text == full_para_text or (cool.text.strip() == full_para_text.strip())):
                 count += 1
 
-                if (para.paragraph_format.left_indent != None or (len(para.text) - len(cool.text.strip()) > 2)):
+                if (para.paragraph_format.left_indent != None or (len(full_para_text) - len(cool.text.strip()) > 2)):
                     cool['style'] = "padding-left: 40px;"
 
-                if para.runs[0].font.size == Pt(14):
+                if para.runs and para.runs[0].font.size == Pt(14):
                     cool.name = 'h2'
                     countofH2 +=1
-                if para.runs[0].font.underline == True:
+                if para.runs and para.runs[0].font.underline == True:
                     newTagUnderline = soup.new_tag("span",style="text-decoration: underline;")
                     cool.insert(1,newTagUnderline)
-                if para.alignment == 1:
+                p_align = safe_alignment(para)
+                if p_align == 1:
                     cool['class'] = "has-text-align-center"
-                elif para.alignment == 2:
+                elif p_align == 2:
                     cool['class'] = "has-text-align-right"
             else:
-                print("Text DO NOT match with each other\n Para.text is ",para.text,"\nCool.text is",cool.text,"\n\n")
+                print("Text DO NOT match with each other\n Para.text is ",full_para_text,"\nCool.text is",cool.text,"\n\n")
     
     img_idx = 0
     for img in soup.find_all("img"):
         if img_idx < len(image_styles):
             img_style = image_styles[img_idx]
-            style_str = '; '.join([f"{k}: {v}" for k, v in img_style.items() if k != 'alignment'])
-            img['style'] = style_str
+            alignment = img_style.get('alignment', 'left')
             
-            if 'alignment' in img_style:
-                alignment = img_style['alignment']
-                img['class'] = img.get('class', []) + [f'align-{alignment}']
+            # Build inline style for dimensions
+            style_parts = []
+            if 'width' in img_style:
+                style_parts.append(f"width: {img_style['width']}")
+            if 'height' in img_style:
+                style_parts.append(f"height: {img_style['height']}")
+            
+            # Apply WordPress alignment classes and display style
+            wp_align_map = {'center': 'aligncenter', 'right': 'alignright', 'left': 'alignleft'}
+            wp_class = wp_align_map.get(alignment, 'alignleft')
+            if alignment == 'center':
+                style_parts += ['display: block', 'margin-left: auto', 'margin-right: auto']
+            elif alignment == 'right':
+                style_parts += ['display: block', 'margin-left: auto']
+            
+            img['style'] = '; '.join(style_parts)
+            img['class'] = img.get('class', []) + [wp_class]
+            
+            # Also set text-align on the parent <p> so paragraph-level alignment is correct
+            parent_p = img.find_parent('p')
+            if parent_p is not None and alignment != 'left':
+                parent_p['class'] = parent_p.get('class', []) + [f'has-text-align-{alignment}']
+                parent_p['style'] = f'text-align: {alignment};'
             
             img_idx += 1
             
@@ -252,7 +329,7 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
                     for col_idx, cell in enumerate(row.find_all(["td", "th"])):
                         if col_idx < len(row_style):
                             cell_style = row_style[col_idx]
-                            style_str = '; '.join([f"{k}: {v}" for k, v in cell_style.items()])
+                            style_str = '; '.join([f"{k}: {v}" for k, v in cell_style.items() if k != 'text_elements'])
                             cell['style'] = style_str
                             
                             # Apply text formatting within the cell
@@ -311,16 +388,20 @@ if __name__ == '__main__':
                 total_publish_payload = []
                 print(image_ids)
                 print('\n------------------------------------------------------------\n')
+
                 for i in range(len(artilces_files)):
                     try:
                         artilce_path = articles_folder_path + artilces_files[str(int(i) + 1)]
                         try:
+                            article_html = ''
                             article_html = convertDocxToHtml(artilce_path, summary_data[i])
                             article_content = process_base64_inline_images(article_html, creds)
                         except Exception as e:
-                            print('There is some issue with getting Html From Beautiful Soup: ')
+                            print(f'There is some issue with getting Html From Beautiful Soup: {artilce_path}')
+                            print(f'Error: {e}')
+                            traceback.print_exc()
+                            continue
 
-                        total_articles = len(image_ids)
                         total_articles = len(image_ids)
                         publish_min = str((total_articles + 1) - int(summary_data[i]['article_number']))   #for publishing the articles in reverse order
                         date_str = publish_date + 'T' + publish_time_hour + ':' + publish_min + ':00'
@@ -360,42 +441,44 @@ if __name__ == '__main__':
                         delete_images(list(image_dict['image_ids'].values()),creds)
                         posts_not_created.append(article_title)
                         break
+                if len(posts_not_created) == 0:           
+                    with Pool() as pool:
+                        results = pool.map(create_post, total_publish_payload)
+                    statuses = []
+                    article_ids = []
+                    for result in results:
+                        if result['status']:
+                            posts_created.append(result['article_title'])
+                            article_ids.append(result['article_id'])
+                        else:
+                            posts_not_created.append(result['article_title'])
+                        statuses.append(result['status'])
+                    
+                    if not all(statuses):
+                        print("Deleteing the images...")
+                        delete_images(list(image_dict['image_ids'].values()),creds)
+                        print("Deleting the draft posts...")
+                        delete_posts(article_ids,creds)
 
-                with Pool() as pool:
-                    results = pool.map(create_post, total_publish_payload)
-                statuses = []
-                article_ids = []
-                for result in results:
-                    if result['status']:
-                        posts_created.append(result['article_title'])
-                        article_ids.append(result['article_id'])
+                    print('\n------------------------------------------------------------\n')
+                    print('Posts created for ' + str(len(posts_created)) + ' articles :')
+                    for i in range(len(posts_created)):
+                        print(str(i + 1) + '. ' + posts_created[i])
+                    print('\n------------------------------------------------------------\n')
+
+                    if len(posts_created) == len(artilces_files):
+                        print('Posts created for all the articles!')
                     else:
-                        posts_not_created.append(result['article_title'])
-                    statuses.append(result['status'])
-                
-                if not all(statuses):
-                    print("Deleteing the images...")
-                    delete_images(list(image_dict['image_ids'].values()),creds)
-                    print("Deleting the draft posts...")
-                    delete_posts(article_ids,creds)
-
-                print('\n------------------------------------------------------------\n')
-                print('Posts created for ' + str(len(posts_created)) + ' articles :')
-                for i in range(len(posts_created)):
-                    print(str(i + 1) + '. ' + posts_created[i])
-                print('\n------------------------------------------------------------\n')
-
-                if len(posts_created) == len(artilces_files):
-                    print('Posts created for all the articles!')
+                        print('Posts could not be created for ' + str(len(posts_not_created)) + ' articles :')
+                        for i in range(len(posts_not_created)):
+                            print(str(i + 1) + '. ' + posts_not_created[i]) 
+                    
+                    end_time = datetime.now()
+                    print("Script finished in:"+ str((end_time - start_time).seconds) +' seconds.')
                 else:
-                    print('Posts could not be created for ' + str(len(posts_not_created)) + ' articles :')
-                    for i in range(len(posts_not_created)):
-                        print(str(i + 1) + '. ' + posts_not_created[i]) 
-                
-                end_time = datetime.now()
-                print("Script finished in:"+ str((end_time - start_time).seconds) +' seconds.')
+                    print(image_dict['message'])
+                    delete_images(list(image_dict['image_ids'].values()),creds)
             else:
-                print(image_dict['message'])
-                delete_images(list(image_dict['image_ids'].values()),creds)
+                print("Skipping post creation")
         else:
             print("Unable to create all the authors! Script stopped.")
