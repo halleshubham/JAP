@@ -68,6 +68,8 @@ def checkIfAnyElementIsToBeRemoved(tag, title, author):
     return tag
 
 def getMatchingSoupElementWithParaText(full_para_text, soupElement):
+    if soupElement is None:
+        return None
     while (full_para_text.strip() != soupElement.text.strip()):
         if (soupElement.li != None):
             while (full_para_text not in soupElement.text):
@@ -241,15 +243,22 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
                 coolUpdate = cool.nextSibling
                 cool.decompose()
                 cool = coolUpdate
+                if cool is None:
+                    break
                 continue
 
             if (author == compareSoupString):
                 coolUpdate = cool.nextSibling
                 cool.decompose()
                 cool = coolUpdate
+                if cool is None:
+                    break
                 continue
 
             cool = checkIfAnyElementIsToBeRemoved(cool,title,author)
+
+            if cool is None:
+                continue
 
             if ((cool.tr != None)):
                 continue
@@ -260,12 +269,16 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
             if ('http' in cool.text):
                 cool = cool.nextSibling
                 count += 1
+                if cool is None:
+                    break
                 continue
 
             if (cool.img != None):
                 count+=1
                 if (cool.text == None):
                     cool = cool.nextSibling
+                    if cool is None:
+                        break
 
             if (cool.text == full_para_text or (cool.text.strip() == full_para_text.strip())):
                 count += 1
