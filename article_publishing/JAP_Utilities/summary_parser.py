@@ -12,6 +12,8 @@ def get_summary_data(summaryfile):
         file_data.append(para.text)
     
     for i in range(1, len(file_data),3):
+        if i + 2 >= len(file_data):
+            break
         article_number_author_pre=file_data[i].split('.')
         article_number=article_number_author_pre[0]
         article_title = '.'.join(article_number_author_pre[1:])

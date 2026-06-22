@@ -240,7 +240,7 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
             compareSoupString = compareSoupString.lower()
             compareSoupString = compareSoupString.replace(' ','')
             if (title == compareSoupString):
-                coolUpdate = cool.nextSibling
+                coolUpdate = cool.next_sibling
                 cool.decompose()
                 cool = coolUpdate
                 if cool is None:
@@ -248,7 +248,7 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
                 continue
 
             if (author == compareSoupString):
-                coolUpdate = cool.nextSibling
+                coolUpdate = cool.next_sibling
                 cool.decompose()
                 cool = coolUpdate
                 if cool is None:
@@ -267,7 +267,7 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
                 continue
 
             if ('http' in cool.text):
-                cool = cool.nextSibling
+                cool = cool.next_sibling
                 count += 1
                 if cool is None:
                     break
@@ -276,7 +276,7 @@ def convertDocxToHtml(docxFilePath,summaryOfArticle):
             if (cool.img != None):
                 count+=1
                 if (cool.text == None):
-                    cool = cool.nextSibling
+                    cool = cool.next_sibling
                     if cool is None:
                         break
 
@@ -416,7 +416,11 @@ if __name__ == '__main__':
                             continue
 
                         total_articles = len(image_ids)
-                        publish_min = str((total_articles + 1) - int(summary_data[i]['article_number']))   #for publishing the articles in reverse order
+                        try:
+                            article_num = int(summary_data[i]['article_number'])
+                        except (ValueError, TypeError):
+                            article_num = i + 1
+                        publish_min = str((total_articles + 1) - article_num)   #for publishing the articles in reverse order
                         date_str = publish_date + 'T' + publish_time_hour + ':' + publish_min + ':00'
                         article_date = datetime.strptime(date_str,'%Y-%m-%dT%H:%M:%S')  
                         
@@ -489,7 +493,7 @@ if __name__ == '__main__':
                     end_time = datetime.now()
                     print("Script finished in:"+ str((end_time - start_time).seconds) +' seconds.')
                 else:
-                    print(image_dict['message'])
+                    print("Post creation aborted due to errors during payload preparation.")
                     delete_images(list(image_dict['image_ids'].values()),creds)
             else:
                 print("Skipping post creation")
