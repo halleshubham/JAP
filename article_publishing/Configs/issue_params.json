@@ -1,17 +1,47 @@
 {
-  "summaryfile": "C:\\Users\\aindrayani\\Downloads\\Summary.docx",
+  "summaryfile": "/home/shubhamshack/Downloads/janata/Summary Janata May 31 – June 7 2026.docx",
 
-  "articles_folder_path": "C:\\Users\\aindrayani\\Downloads\\janataarticles714jan\\",
+  "articles_folder_path": "/tmp/janata_articles/",
 
-  "images_folder_path": "C:\\Users\\aindrayani\\Downloads\\images\\",
+  "images_folder_path": "/home/shubhamshack/Downloads/janata/images/",
 
-  "publish_date": "2024-01-14",
+  "publish_date": "2026-05-31",
 
-  "volume_number": "78",
-  
-  "issue_number" : "1",
+  "volume_number": "80",
 
-  "print_edition_articles": [ 0, 0 ],
+  "issue_number": "9",
 
-  "blog_edition_articles": [ 1, 25 ]
+  "print_edition_articles": [0, 0],
+
+  "blog_edition_articles": [1, 27],
+
+  "article_categories": {
+    "1":  [521, 2029, 59],
+    "2":  [521, 2029, 7],
+    "3":  [521, 2029, 7],
+    "4":  [521, 2029, 6],
+    "5":  [521, 2029],
+    "6":  [521, 2029, 6],
+    "7":  [521, 9, 6],
+    "8":  [521, 2029, 6],
+    "9":  [521, 11, 2029],
+    "10": [521, 2029, 59],
+    "11": [521, 2033, 9],
+    "12": [521, 2029, 7],
+    "13": [521, 11],
+    "14": [521, 11],
+    "15": [521, 11, 1996],
+    "16": [521, 11, 7],
+    "17": [521, 11, 10],
+    "18": [521, 11, 10],
+    "19": [521, 11],
+    "20": [521, 11, 2029],
+    "21": [521, 11, 1932],
+    "22": [521, 11, 10],
+    "23": [521, 9, 6],
+    "24": [521, 1996, 2033],
+    "25": [521, 9],
+    "26": [521, 10, 6],
+    "27": [521, 13]
+  }
 }

@@ -1,0 +1,7 @@
+{
+    "wp_username": "your_wordpress_username",
+    "wp_app_password": "xxxx xxxx xxxx xxxx xxxx xxxx",
+
+    "google_api_key": "your_google_api_key",
+    "google_project_cx": "your_search_engine_id"
+}

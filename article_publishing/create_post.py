@@ -432,12 +432,16 @@ if __name__ == '__main__':
                         article_image_id = image_ids[str(int(i) + 1)]
                         article_author_id = authors_ids[i]
 
-                        if (i + 1) >= print_edition_articles[0] and (i + 1) <= print_edition_articles[1]:
-                            categories = "669" #id for published category
+                        article_num_str = str(int(i) + 1)
+                        article_categories = params.get('article_categories', {})
+                        if article_num_str in article_categories:
+                            categories = article_categories[article_num_str]
+                        elif (i + 1) >= print_edition_articles[0] and (i + 1) <= print_edition_articles[1]:
+                            categories = [669]
                         elif (i + 1) >= blog_edition_articles[0] and (i + 1) <= blog_edition_articles[1]:
-                             categories = "521" #id for blog category
-                        else: 
-                            categories = "521" 
+                            categories = [521]
+                        else:
+                            categories = [521]
 
                         data = {
                                 'status':'draft',

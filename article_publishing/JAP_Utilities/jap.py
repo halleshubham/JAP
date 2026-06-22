@@ -43,16 +43,16 @@ def upload_inline_image_to_wordpress(image_data, image_filename, creds):
     import base64 as b64
     
     # Check if basic auth credentials are available
-    if 'wp_username' not in creds or 'wp_password' not in creds:
-        print("Basic auth credentials (wp_username, wp_password) not found in config")
+    if 'wp_username' not in creds or 'wp_app_password' not in creds:
+        print("Application password credentials (wp_username, wp_app_password) not found in config")
         return False
-    
+
     image_data = re.sub('^data:image/.+;base64,', '', image_data)
     image_bytes = base64.b64decode(image_data)
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/'
-    
-    # Create basic auth header
-    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+
+    # Create basic auth header using WordPress Application Password
+    credentials = f"{creds['wp_username']}:{creds['wp_app_password']}"
     encoded_credentials = b64.b64encode(credentials.encode()).decode()
     
     headers = { 
@@ -125,16 +125,16 @@ def get_author_by_slug(author, creds):
     import base64
     
     # Check if basic auth credentials are available
-    if 'wp_username' not in creds or 'wp_password' not in creds:
-        print("Basic auth credentials (wp_username, wp_password) not found in config")
+    if 'wp_username' not in creds or 'wp_app_password' not in creds:
+        print("Application password credentials (wp_username, wp_app_password) not found in config")
         return False
-    
+
     username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
     username = unidecode.unidecode(username_pre)[:49]
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/users?slug=' + username
 
-    # Create basic auth header
-    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+    # Create basic auth header using WordPress Application Password
+    credentials = f"{creds['wp_username']}:{creds['wp_app_password']}"
     encoded_credentials = base64.b64encode(credentials.encode()).decode()
     
     headers = { 
@@ -188,16 +188,16 @@ def get_author_by_email(author, creds):
     import base64
     
     # Check if basic auth credentials are available
-    if 'wp_username' not in creds or 'wp_password' not in creds:
-        print("Basic auth credentials (wp_username, wp_password) not found in config")
+    if 'wp_username' not in creds or 'wp_app_password' not in creds:
+        print("Application password credentials (wp_username, wp_app_password) not found in config")
         return False
-    
+
     username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
     username = unidecode.unidecode(username_pre)[:49]
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/users?search=' + username + '@test.com'
-    
-    # Create basic auth header
-    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+
+    # Create basic auth header using WordPress Application Password
+    credentials = f"{creds['wp_username']}:{creds['wp_app_password']}"
     encoded_credentials = base64.b64encode(credentials.encode()).decode()
     
     headers = { 
@@ -225,30 +225,58 @@ def get_author_by_email(author, creds):
 
 
 
+def get_author_id_from_author_page(username):
+    """Scrape the WordPress author archive page to get the user ID.
+
+    WordPress adds 'author-{id}' as a body class on author pages, which
+    is publicly accessible even when the REST API user endpoint is blocked
+    by a security plugin.
+    """
+    from bs4 import BeautifulSoup
+    slug = username.lower()
+    url = f'https://janataweekly.org/author/{slug}/'
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        if r.status_code != 200:
+            return False
+        soup = BeautifulSoup(r.text, 'html.parser')
+        body = soup.find('body')
+        if body:
+            for cls in body.get('class', []):
+                # WordPress adds 'author-{id}' class (a numeric class)
+                if cls.startswith('author-'):
+                    candidate = cls[len('author-'):]
+                    if candidate.isdigit():
+                        return int(candidate)
+    except Exception as e:
+        print(f"Error scraping author page for {username}: {e}")
+    return False
+
+
 def create_author(args):
     (author,creds) = args
 
-    # Check if basic auth credentials are available
-    if 'wp_username' not in creds or 'wp_password' not in creds:
-        print("Basic auth credentials (wp_username, wp_password) not found in config")
+    if 'wp_username' not in creds or 'wp_app_password' not in creds:
+        print("Application password credentials (wp_username, wp_app_password) not found in config")
         return False
 
     author_id = get_author_by_slug(author,creds)
     if not author_id:
         import base64
-        
+
         protected_url = 'https://janataweekly.org/wp-json/wp/v2/users'
-        
-        # Create basic auth header
-        credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+
+        # Create basic auth header using WordPress Application Password
+        credentials = f"{creds['wp_username']}:{creds['wp_app_password']}"
         encoded_credentials = base64.b64encode(credentials.encode()).decode()
-        
-        headers = { 
+
+        headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
             'Authorization': f'Basic {encoded_credentials}',
             'Content-Type': 'application/json'
         }
-        
+
         username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
         username = unidecode.unidecode(username_pre)[:49]
 
@@ -260,30 +288,35 @@ def create_author(args):
                 'roles':'author',
                 'password':'testpass@1234'
                 }
-        
+
         r = requests.post(protected_url, headers=headers, json=data)
-        
+
         if r.status_code == 201:
             print('Author ' + author + ' added.')
             return r.json()['id']
-            
+
         else:
             if r.status_code == 401:
                 print(f"401 Unauthorized error creating author: {author}")
                 print("Please check your WordPress username and password")
                 return False
-                
+
             try:
                 error = r.json()
                 if error['code'] == 'existing_user_email' or error['code'] == 'existing_user_login':
-                    existing_author_id = get_author_by_email(author,creds)
+                    # REST API user listing is blocked — fall back to scraping the author archive page
+                    existing_author_id = get_author_id_from_author_page(username)
                     if existing_author_id:
-                        update_status = update_author(author,existing_author_id,creds)
+                        print(f'Author {author} already present (id={existing_author_id}, found via author page).')
+                        return existing_author_id
+                    # Last resort: try the email-based API lookup
+                    existing_author_id = get_author_by_email(author, creds)
+                    if existing_author_id:
+                        update_status = update_author(author, existing_author_id, creds)
                         if update_status:
                             return update_status
-                        else: 
-                            print('Author ' + author + ' could not be added.')
-                            return False
+                    print('Author ' + author + ' could not be added.')
+                    return False
                 else:
                     pprint(error)
                     print('Author ' + author + ' could not be added.')
@@ -301,17 +334,16 @@ def update_author(author,existing_author_id,creds):
     """Update author using basic authentication"""
     import base64
     
-    # Check if basic auth credentials are available
-    if 'wp_username' not in creds or 'wp_password' not in creds:
-        print("Basic auth credentials (wp_username, wp_password) not found in config")
+    if 'wp_username' not in creds or 'wp_app_password' not in creds:
+        print("Application password credentials (wp_username, wp_app_password) not found in config")
         return False
-    
+
     username_pre = ''.join(e for e in author if e.isalnum()) # for removing all the special charathers
     username = unidecode.unidecode(username_pre)[:49]
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/users/' + str(existing_author_id)
-    
-    # Create basic auth header
-    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+
+    # Create basic auth header using WordPress Application Password
+    credentials = f"{creds['wp_username']}:{creds['wp_app_password']}"
     encoded_credentials = base64.b64encode(credentials.encode()).decode()
     
     headers = { 
@@ -456,15 +488,14 @@ def upload_image(args):
     
     (optimized_image_path, creds) = args
 
-    # Check if basic auth credentials are available
-    if 'wp_username' not in creds or 'wp_password' not in creds:
-        print("Basic auth credentials (wp_username, wp_password) not found in config")
-        return {'status': False, 'message': 'Basic auth credentials missing'}
+    if 'wp_username' not in creds or 'wp_app_password' not in creds:
+        print("Application password credentials (wp_username, wp_app_password) not found in config")
+        return {'status': False, 'message': 'Application password credentials missing'}
 
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/'
-    
-    # Create basic auth header
-    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+
+    # Create basic auth header using WordPress Application Password
+    credentials = f"{creds['wp_username']}:{creds['wp_app_password']}"
     encoded_credentials = base64.b64encode(credentials.encode()).decode()
     
     headers = { 
@@ -541,20 +572,19 @@ def delete_image(args):
     
     (image_id, creds) = args
     
-    # Check if basic auth credentials are available
-    if 'wp_username' not in creds or 'wp_password' not in creds:
-        print("Basic auth credentials (wp_username, wp_password) not found in config")
+    if 'wp_username' not in creds or 'wp_app_password' not in creds:
+        print("Application password credentials (wp_username, wp_app_password) not found in config")
         return
-    
-    # Create basic auth header
-    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+
+    # Create basic auth header using WordPress Application Password
+    credentials = f"{creds['wp_username']}:{creds['wp_app_password']}"
     encoded_credentials = base64.b64encode(credentials.encode()).decode()
-    
-    headers = { 
+
+    headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'Authorization': f'Basic {encoded_credentials}'
     }
-    
+
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/media/' + str(image_id) + '?force=true'
     r = requests.delete(protected_url, headers=headers)
     
@@ -608,16 +638,15 @@ def create_post(args):
     
     (data, creds) = args
     
-    # Check if basic auth credentials are available
-    if 'wp_username' not in creds or 'wp_password' not in creds:
-        print("Basic auth credentials (wp_username, wp_password) not found in config")
+    if 'wp_username' not in creds or 'wp_app_password' not in creds:
+        print("Application password credentials (wp_username, wp_app_password) not found in config")
         return {'status': False, 'article_title': data['title']}
-    
+
     try:
         protected_url = 'https://janataweekly.org/wp-json/wp/v2/posts/'
-        
-        # Create basic auth header
-        credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+
+        # Create basic auth header using WordPress Application Password
+        credentials = f"{creds['wp_username']}:{creds['wp_app_password']}"
         encoded_credentials = base64.b64encode(credentials.encode()).decode()
         
         headers = { 
@@ -669,20 +698,19 @@ def delete_post(args):
     
     (article_id, creds) = args
     
-    # Check if basic auth credentials are available
-    if 'wp_username' not in creds or 'wp_password' not in creds:
-        print("Basic auth credentials (wp_username, wp_password) not found in config")
+    if 'wp_username' not in creds or 'wp_app_password' not in creds:
+        print("Application password credentials (wp_username, wp_app_password) not found in config")
         return
-    
-    # Create basic auth header
-    credentials = f"{creds['wp_username']}:{creds['wp_password']}"
+
+    # Create basic auth header using WordPress Application Password
+    credentials = f"{creds['wp_username']}:{creds['wp_app_password']}"
     encoded_credentials = base64.b64encode(credentials.encode()).decode()
-    
-    headers = { 
+
+    headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
         'Authorization': f'Basic {encoded_credentials}'
     }
-    
+
     protected_url = 'https://janataweekly.org/wp-json/wp/v2/posts/' + str(article_id) + '?force=true'
     r = requests.delete(protected_url, headers=headers)
     
